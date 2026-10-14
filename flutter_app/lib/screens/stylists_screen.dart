@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/zalono_switch.dart';
 
 class StylistsScreen extends StatefulWidget {
   const StylistsScreen({super.key});
@@ -48,7 +49,8 @@ class _StylistsScreenState extends State<StylistsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
               ),
               onPressed: () {},
-              child: const Text('+ Add stylist', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              child: const Text('+ Add stylist',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -61,12 +63,16 @@ class _StylistsScreenState extends State<StylistsScreen> {
             children: [
               const Text(
                 'Stylists',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary),
+                style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: ZalonoTheme.textPrimary),
               ),
               const SizedBox(height: 6),
               const Text(
                 'Turn a stylist off when they are not in. Customers stop seeing them and their slots close automatically.',
-                style: TextStyle(fontSize: 14, color: ZalonoTheme.textSecondary),
+                style:
+                    TextStyle(fontSize: 14, color: ZalonoTheme.textSecondary),
               ),
               const SizedBox(height: 24),
 
@@ -88,7 +94,8 @@ class _StylistsScreenState extends State<StylistsScreen> {
               _buildStylistCard(
                 initial: 'N',
                 name: 'Neha Patel',
-                status: 'With a walk-in till 3:20 PM ·\nopens again automatically',
+                status:
+                    'With a walk-in till 3:20 PM ·\nopens again automatically',
                 isAvailable: nehaAvailable,
                 onToggle: (val) => setState(() => nehaAvailable = val),
               ),
@@ -97,7 +104,10 @@ class _StylistsScreenState extends State<StylistsScreen> {
               // What customers see footer
               const Text(
                 'WHAT CUSTOMERS SEE',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: ZalonoTheme.textSecondary),
               ),
               const SizedBox(height: 10),
               Row(
@@ -112,7 +122,8 @@ class _StylistsScreenState extends State<StylistsScreen> {
                 rahulAvailable
                     ? 'All 3 stylists are open for booking.'
                     : "Rahul is hidden until 5:00 PM. Neha's slots reopen after 3:20 PM.",
-                style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
+                style: const TextStyle(
+                    fontSize: 13, color: ZalonoTheme.textSecondary),
               ),
             ],
           ),
@@ -130,7 +141,8 @@ class _StylistsScreenState extends State<StylistsScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: ZalonoTheme.border),
       ),
-      child: Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+      child: Text(name,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
     );
   }
 
@@ -154,22 +166,29 @@ class _StylistsScreenState extends State<StylistsScreen> {
           CircleAvatar(
             radius: 20,
             backgroundColor: ZalonoTheme.primaryLight,
-            child: Text(initial, style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
+            child: Text(initial,
+                style: const TextStyle(
+                    color: ZalonoTheme.primary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16)),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                Text(name,
+                    style:
+                        const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 2),
-                Text(status, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
+                Text(status,
+                    style: const TextStyle(
+                        fontSize: 13, color: ZalonoTheme.textSecondary)),
               ],
             ),
           ),
-          Switch(
+          ZalonoSwitch(
             value: isAvailable,
-            activeColor: ZalonoTheme.primary,
             onChanged: onToggle,
           ),
         ],
@@ -190,28 +209,36 @@ class _StylistsScreenState extends State<StylistsScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 20,
                 backgroundColor: ZalonoTheme.primaryLight,
-                child: const Text('R', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
+                child: Text('R',
+                    style: TextStyle(
+                        color: ZalonoTheme.primary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16)),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Rahul Das', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                    const Text('Rahul Das',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 2),
                     Text(
-                      rahulAvailable ? 'Available · 1 booking today' : 'Off until 5:00 PM',
-                      style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
+                      rahulAvailable
+                          ? 'Available · 1 booking today'
+                          : 'Off until 5:00 PM',
+                      style: const TextStyle(
+                          fontSize: 13, color: ZalonoTheme.textSecondary),
                     ),
                   ],
                 ),
               ),
-              Switch(
+              ZalonoSwitch(
                 value: rahulAvailable,
-                activeColor: ZalonoTheme.primary,
                 onChanged: (val) {
                   if (!val) {
                     _showTurnOffRahulSheet();
@@ -232,35 +259,48 @@ class _StylistsScreenState extends State<StylistsScreen> {
               ),
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('1 booking needs a new stylist', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: ZalonoTheme.primaryDark)),
+                      children: [
+                        Text('1 booking needs a new stylist',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: ZalonoTheme.primaryDark)),
                         SizedBox(height: 1),
-                        Text('Sneha R. · 3:00 PM · Facial', style: TextStyle(fontSize: 11, color: ZalonoTheme.primaryDark)),
+                        Text('Sneha R. · 3:00 PM · Facial',
+                            style: TextStyle(
+                                fontSize: 11, color: ZalonoTheme.primaryDark)),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: ZalonoTheme.primary,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text('Reassign', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11)),
+                    child: const Text('Reassign',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11)),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              children: const [
-                Icon(Icons.notifications_none, size: 14, color: ZalonoTheme.primary),
+            const Row(
+              children: [
+                Icon(Icons.notifications_none,
+                    size: 14, color: ZalonoTheme.primary),
                 SizedBox(width: 6),
                 Text(
                   'We will remind you at 5:00 PM to turn Rahul on.',
-                  style: TextStyle(fontSize: 11, color: ZalonoTheme.textSecondary),
+                  style:
+                      TextStyle(fontSize: 11, color: ZalonoTheme.textSecondary),
                 ),
               ],
             ),
@@ -275,7 +315,8 @@ class _StylistsScreenState extends State<StylistsScreen> {
 class _TurnOffStylistSheet extends StatefulWidget {
   final String stylistName;
   final VoidCallback onConfirm;
-  const _TurnOffStylistSheet({required this.stylistName, required this.onConfirm});
+  const _TurnOffStylistSheet(
+      {required this.stylistName, required this.onConfirm});
 
   @override
   State<_TurnOffStylistSheet> createState() => _TurnOffStylistSheetState();
@@ -299,20 +340,27 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
         children: [
           Text(
             'Turn off ${widget.stylistName}?',
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary),
+            style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textPrimary),
           ),
           const SizedBox(height: 6),
           Text(
             'Customers will not see ${widget.stylistName}, and his slots close automatically.',
-            style: const TextStyle(fontSize: 14, color: ZalonoTheme.textSecondary),
+            style:
+                const TextStyle(fontSize: 14, color: ZalonoTheme.textSecondary),
           ),
           const SizedBox(height: 20),
-
-          const Text('OFF FOR', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+          const Text('OFF FOR',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: ZalonoTheme.textSecondary)),
           const SizedBox(height: 8),
-
           Row(
-            children: ['Until 5:00 PM', 'Today', 'Tomorrow', 'Custom'].map((dur) {
+            children:
+                ['Until 5:00 PM', 'Today', 'Tomorrow', 'Custom'].map((dur) {
               final active = dur == selectedOffDuration;
               return Expanded(
                 child: GestureDetector(
@@ -323,7 +371,10 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
                     decoration: BoxDecoration(
                       color: active ? ZalonoTheme.primary : Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                      border: Border.all(
+                          color: active
+                              ? ZalonoTheme.primary
+                              : ZalonoTheme.border),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -340,18 +391,23 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
             }).toList(),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: const [
-              Icon(Icons.notifications_none, size: 14, color: ZalonoTheme.primary),
+          const Row(
+            children: [
+              Icon(Icons.notifications_none,
+                  size: 14, color: ZalonoTheme.primary),
               SizedBox(width: 6),
-              Text('We will remind you at 5:00 PM to turn Rahul on.', style: TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary)),
+              Text('We will remind you at 5:00 PM to turn Rahul on.',
+                  style: TextStyle(
+                      fontSize: 12, color: ZalonoTheme.textSecondary)),
             ],
           ),
           const SizedBox(height: 20),
-
-          const Text('1 BOOKING TO MOVE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+          const Text('1 BOOKING TO MOVE',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: ZalonoTheme.textSecondary)),
           const SizedBox(height: 8),
-
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -362,7 +418,9 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Sneha R. · 3:00 PM · Facial', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                const Text('Sneha R. · 3:00 PM · Facial',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 10),
                 Row(
                   children: ['Move to Priya', 'Move to Neha'].map((opt) {
@@ -370,19 +428,28 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
                     final active = selectedReassignTarget == target;
                     return Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => selectedReassignTarget = target),
+                        onTap: () =>
+                            setState(() => selectedReassignTarget = target),
                         child: Container(
                           margin: const EdgeInsets.only(right: 6),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: active ? ZalonoTheme.primary : Colors.white,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                            border: Border.all(
+                                color: active
+                                    ? ZalonoTheme.primary
+                                    : ZalonoTheme.border),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             opt,
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: active ? Colors.white : ZalonoTheme.textPrimary),
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: active
+                                    ? Colors.white
+                                    : ZalonoTheme.textPrimary),
                           ),
                         ),
                       ),
@@ -390,12 +457,13 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
                   }).toList(),
                 ),
                 const SizedBox(height: 8),
-                const Text('The customer is told about the change.', style: TextStyle(fontSize: 11, color: ZalonoTheme.textSecondary)),
+                const Text('The customer is told about the change.',
+                    style: TextStyle(
+                        fontSize: 11, color: ZalonoTheme.textSecondary)),
               ],
             ),
           ),
           const SizedBox(height: 24),
-
           ElevatedButton(
             onPressed: widget.onConfirm,
             child: Text('Turn off ${widget.stylistName}'),

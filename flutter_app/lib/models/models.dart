@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 
 enum SalonCategory { basic, medium, premium, ultraPremium }
 enum BookingStatus { inChair, confirmed, done, noShow, cancelled }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'theme/app_theme.dart';
-import 'models/models.dart';
+
 import 'screens/r1_welcome_screen.dart';
 import 'screens/registration_screens.dart';
 import 'screens/login_screens.dart';
@@ -11,13 +11,21 @@ import 'screens/stylists_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/more_screens.dart';
 
+import 'package:provider/provider.dart';
+import 'services/app_state.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const ZalonoPartnerApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => SalonAppState(),
+      child: const ZalonoPartnerApp(),
+    ),
+  );
 }
 
 class ZalonoPartnerApp extends StatelessWidget {

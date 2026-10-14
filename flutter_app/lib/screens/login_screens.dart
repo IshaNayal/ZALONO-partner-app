@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/action_dialogs.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,23 +11,94 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String phone = '98765 43210';
-  List<String> enteredOtp = ['4', '2', '7', '', '', ''];
+  late TextEditingController _phoneController;
+  late List<TextEditingController> _otpControllers;
+  late List<FocusNode> _otpFocusNodes;
+
   bool isBlocked = false;
   bool showNotificationSim = false;
+  int resendCountdown = 24;
+  Timer? _timer;
 
-  void _fillFullCodeAndCheck() {
-    setState(() {
-      enteredOtp = ['4', '2', '7', '9', '0', '1'];
-      // Trigger blocked state first (like A2 in design), or allow toggle
-      isBlocked = true;
+  @override
+  void initState() {
+    super.initState();
+    _phoneController = TextEditingController(text: '98765 43210');
+    _otpControllers = List.generate(6, (_) => TextEditingController());
+    _otpFocusNodes = List.generate(6, (_) => FocusNode());
+
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      if (resendCountdown > 0) {
+        setState(() => resendCountdown--);
+      } else {
+        t.cancel();
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _phoneController.dispose();
+    for (var c in _otpControllers) {
+      c.dispose();
+    }
+    for (var f in _otpFocusNodes) {
+      f.dispose();
+    }
+    super.dispose();
   }
 
   void _simulateApproval() {
     setState(() {
       showNotificationSim = true;
     });
+  }
+
+  void _resendCode() {
+    setState(() {
+      resendCountdown = 30;
+      isBlocked = false;
+      for (var c in _otpControllers) {
+        c.clear();
+      }
+    });
+    _startCountdown();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('OTP sent to +91 ${_phoneController.text}: 427901'),
+        backgroundColor: ZalonoTheme.primary,
+      ),
+    );
+  }
+
+  void _handleLogin() {
+    final code = _otpControllers.map((c) => c.text).join();
+    if (code.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter all 6 digits of the code.'),
+          backgroundColor: ZalonoTheme.primary,
+        ),
+      );
+      return;
+    }
+
+    if (!isBlocked) {
+      // First attempt triggers A2: Login Blocked / Not approved yet
+      setState(() {
+        isBlocked = true;
+      });
+    } else {
+      // If tapped again or approved, enter the app
+      Navigator.pushReplacementNamed(context, '/main');
+    }
   }
 
   @override
@@ -96,13 +169,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
+              // MOBILE NUMBER: in-line editable field identical to R2
               const Text(
                 'MOBILE NUMBER',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary),
               ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -111,13 +185,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Row(
                   children: [
                     const Text('+91', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    const SizedBox(width: 10),
+                    Container(width: 1, height: 24, color: ZalonoTheme.border),
                     const SizedBox(width: 12),
-                    Text(phone, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Expanded(
+                      child: TextField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          isDense: true,
+                          hintText: 'Enter mobile number',
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    const Icon(Icons.edit_outlined, size: 18, color: ZalonoTheme.primary),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
+              // ENTER THE 6-DIGIT CODE: Manual input by hand
               const Text(
                 'ENTER THE 6-DIGIT CODE',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary),
@@ -126,28 +216,45 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) {
-                  final digit = enteredOtp[index];
-                  final isFocused = index == 3 && !isBlocked;
-                  return GestureDetector(
-                    onTap: _fillFullCodeAndCheck,
-                    child: Container(
-                      width: 46,
-                      height: 52,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isFocused
-                              ? ZalonoTheme.primary
-                              : (isBlocked ? ZalonoTheme.border : ZalonoTheme.border),
-                          width: isFocused ? 2 : 1,
-                        ),
+                  final isFocused = _otpFocusNodes[index].hasFocus;
+                  final hasVal = _otpControllers[index].text.isNotEmpty;
+                  return Container(
+                    width: 46,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isFocused
+                            ? ZalonoTheme.primary
+                            : (hasVal ? ZalonoTheme.textPrimary : ZalonoTheme.border),
+                        width: isFocused ? 1.8 : 1,
                       ),
-                      child: Text(
-                        digit,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                    ),
+                    child: TextField(
+                      controller: _otpControllers[index],
+                      focusNode: _otpFocusNodes[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
                       ),
+                      onChanged: (val) {
+                        setState(() {
+                          if (val.isNotEmpty && index < 5) {
+                            _otpFocusNodes[index + 1].requestFocus();
+                          }
+                          final code = _otpControllers.map((c) => c.text).join();
+                          if (code.length == 6) {
+                            _otpFocusNodes[5].unfocus();
+                          }
+                        });
+                      },
                     ),
                   );
                 }),
@@ -155,9 +262,33 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 12),
 
               if (!isBlocked)
-                const Text(
-                  'Resend code in 0:24',
-                  style: TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Resend code in 0:${resendCountdown.toString().padLeft(2, '0')}',
+                      style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            const dummy = ['4', '2', '7', '9', '0', '1'];
+                            for (int i = 0; i < 6; i++) {
+                              _otpControllers[i].text = dummy[i];
+                            }
+                            setState(() {});
+                          },
+                          child: const Text('Auto-fill', style: TextStyle(color: ZalonoTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: _resendCode,
+                          child: const Text('Resend now', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 13)),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
 
               // A2: Blocked Card
@@ -168,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: ZalonoTheme.primaryLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: ZalonoTheme.primary.withOpacity(0.3)),
+                    border: Border.all(color: ZalonoTheme.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,10 +313,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Icon(Icons.lock, color: Colors.white, size: 16),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'Not approved yet',
                               style: TextStyle(
@@ -227,14 +358,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
               ElevatedButton(
-                onPressed: () {
-                  if (!isBlocked) {
-                    _fillFullCodeAndCheck();
-                  } else {
-                    // Navigate directly into Main Shell once approved
-                    Navigator.pushReplacementNamed(context, '/main');
-                  }
-                },
+                onPressed: _handleLogin,
                 child: Text(isBlocked ? 'Log in (Approved)' : 'Log in'),
               ),
               const SizedBox(height: 12),
@@ -242,13 +366,16 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: isBlocked
                     ? TextButton(
-                        onPressed: () {},
+                        onPressed: () => ActionDialogs.showSupportSheet(context),
                         child: const Text('Contact support', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
                       )
-                    : const Text(
-                        'New salon? Ask a Zalono executive for an onboarding\ncode.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
+                    : TextButton(
+                        onPressed: () => ActionDialogs.showSupportSheet(context),
+                        child: const Text(
+                          'New salon? Ask a Zalono executive for an onboarding code.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 13, color: ZalonoTheme.primary, fontWeight: FontWeight.w600),
+                        ),
                       ),
               ),
               const SizedBox(height: 10),
@@ -299,7 +426,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -322,21 +449,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
+                              children: [
                                 Text('ZALONO PARTNER', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
                                 Text('now', style: TextStyle(fontSize: 11, color: ZalonoTheme.textMuted)),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            const Text('Glow Studio is approved', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
-                            const SizedBox(height: 2),
-                            const Text(
+                            SizedBox(height: 4),
+                            Text('Glow Studio is approved', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+                            SizedBox(height: 2),
+                            Text(
                               'You can now log in and start taking bookings.',
                               style: TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary, height: 1.3),
                             ),

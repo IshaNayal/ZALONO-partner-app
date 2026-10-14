@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/action_dialogs.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -9,11 +10,18 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: ZalonoTheme.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 40 > 0 ? constraints.maxHeight - 40 : 0,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
               // Header Tag
               Row(
                 children: [
@@ -78,7 +86,7 @@ class WelcomeScreen extends StatelessWidget {
                   border: Border.all(color: ZalonoTheme.border),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -134,8 +142,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: const [
+                    const Row(
+                      children:  [
                         Icon(Icons.schedule, size: 16, color: ZalonoTheme.primary),
                         SizedBox(width: 6),
                         Text(
@@ -177,18 +185,26 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const Center(
-                child: Text(
-                  'By continuing you accept the Terms & Privacy Policy.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: ZalonoTheme.textMuted,
+              Center(
+                child: GestureDetector(
+                  onTap: () => ActionDialogs.showTermsSheet(context),
+                  child: const Text(
+                    'By continuing you accept the Terms & Privacy Policy.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ZalonoTheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-            ],
-          ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

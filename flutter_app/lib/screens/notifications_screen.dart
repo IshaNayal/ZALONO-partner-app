@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/models.dart';
+import '../services/app_state.dart';
 import '../theme/app_theme.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  bool rahulActionTaken = false;
-  bool allRead = false;
-
-  @override
   Widget build(BuildContext context) {
+    final appState = context.watch<SalonAppState>();
+
     return Scaffold(
       backgroundColor: ZalonoTheme.background,
       appBar: AppBar(
@@ -23,7 +20,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => setState(() => allRead = true),
+            onPressed: () {
+              appState.markAllNotificationsRead();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('All notifications marked as read.')),
+              );
+            },
             child: const Text('Mark all read', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 8),
@@ -41,169 +43,140 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const Text('TODAY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary, letterSpacing: 0.5)),
             const SizedBox(height: 12),
 
-            // Card 1: Rahul off time has ended
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: ZalonoTheme.primary, width: 1.2),
+            if (appState.notifications.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.0),
+                  child: Text('No notifications right now', style: TextStyle(color: ZalonoTheme.textSecondary, fontWeight: FontWeight.w600)),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(10)),
-                        child: const Icon(Icons.group_outlined, color: ZalonoTheme.primary, size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text("Rahul's off time has\nended", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-                                Row(
-                                  children: [
-                                    const Text('5:00 PM', style: TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary)),
-                                    if (!allRead) ...[
-                                      const SizedBox(width: 6),
-                                      const CircleAvatar(radius: 4, backgroundColor: ZalonoTheme.primary),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Turn Rahul on so customers can book him again.',
-                              style: TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      const SizedBox(width: 44),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(100, 36),
-                          backgroundColor: ZalonoTheme.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                        ),
-                        onPressed: () {
-                          setState(() => rahulActionTaken = true);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Rahul turned on! Now available for booking.'), backgroundColor: ZalonoTheme.primary),
-                          );
-                        },
-                        child: Text(rahulActionTaken ? 'Turned on' : 'Turn on', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                      ),
-                      const SizedBox(width: 12),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text('Later', style: TextStyle(color: ZalonoTheme.textSecondary, fontWeight: FontWeight.w600, fontSize: 13)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
 
-            // Card 2: Priya is open for booking again
-            _buildNotificationItem(
-              icon: Icons.check,
-              title: 'Priya is open for booking again',
-              body: 'Walk-in Mohit S. ended at 3:25 PM.',
-              time: '3:25 PM',
-              unread: !allRead,
-            ),
-            const SizedBox(height: 12),
-
-            // Card 3: Aarav K. is on the way
-            _buildNotificationItem(
-              icon: Icons.schedule,
-              title: 'Aarav K. is on the way',
-              body: 'Left home, about 8 min away for his 2:20 PM booking.',
-              time: '2:12 PM',
-              unread: false,
-            ),
-            const SizedBox(height: 12),
-
-            // Card 4: New booking · Divya S.
-            _buildNotificationItem(
-              icon: Icons.calendar_today_outlined,
-              title: 'New booking · Divya S.',
-              body: 'Tue 13 Oct · 11:00 AM · Haircut (Women) with Priya',
-              time: '2:10 PM',
-              unread: false,
-            ),
+            ...appState.notifications.map((notif) {
+              return Dismissible(
+                key: Key(notif.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(color: Colors.red[700], borderRadius: BorderRadius.circular(20)),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) {
+                  appState.dismissNotification(notif.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notification dismissed.')),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: _buildNotificationCard(context, notif, appState),
+                ),
+              );
+            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNotificationItem({
-    required IconData icon,
-    required String title,
-    required String body,
-    required String time,
-    required bool unread,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ZalonoTheme.border),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: ZalonoTheme.primary, size: 20),
+  Widget _buildNotificationCard(BuildContext context, NotificationModel notif, SalonAppState state) {
+    IconData icon = Icons.notifications;
+    if (notif.type == 'stylist_off') icon = Icons.group_outlined;
+    if (notif.type == 'stylist_free') icon = Icons.check;
+    if (notif.type == 'customer_status') icon = Icons.schedule;
+    if (notif.type == 'new_booking') icon = Icons.calendar_today_outlined;
+
+    return GestureDetector(
+      onTap: () {
+        state.markNotificationRead(notif.id);
+        if (notif.type == 'stylist_off' || notif.type == 'stylist_free') {
+          Navigator.pushNamed(context, '/stylists');
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: notif.isRead ? ZalonoTheme.border : ZalonoTheme.primary,
+            width: notif.isRead ? 1 : 1.3,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-                    ),
-                    Row(
-                      children: [
-                        Text(time, style: const TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary)),
-                        if (unread) ...[
-                          const SizedBox(width: 6),
-                          const CircleAvatar(radius: 4, backgroundColor: ZalonoTheme.primary),
-                        ],
-                      ],
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(10)),
+                  child: Icon(icon, color: ZalonoTheme.primary, size: 20),
                 ),
-                const SizedBox(height: 4),
-                Text(body, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(notif.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                          ),
+                          Row(
+                            children: [
+                              Text(notif.time, style: const TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary)),
+                              if (!notif.isRead) ...[
+                                const SizedBox(width: 6),
+                                const CircleAvatar(radius: 4, backgroundColor: ZalonoTheme.primary),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(notif.body, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            if (notif.hasAction && !notif.isRead) ...[
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  const SizedBox(width: 44),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(100, 36),
+                      backgroundColor: ZalonoTheme.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    ),
+                    onPressed: () {
+                      state.turnOnStylist('Rahul');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Rahul turned on! Now available for booking.'), backgroundColor: ZalonoTheme.primary),
+                      );
+                    },
+                    child: const Text('Turn on', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () {
+                      state.markNotificationRead(notif.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Reminder snoozed for 30 minutes.')),
+                      );
+                    },
+                    child: const Text('Later', style: TextStyle(color: ZalonoTheme.textSecondary, fontWeight: FontWeight.w600, fontSize: 13)),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
