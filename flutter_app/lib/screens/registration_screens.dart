@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
 import '../widgets/zalono_switch.dart';
 
@@ -33,6 +35,13 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   bool panAdded = true;
   bool aadhaarAdded = false;
   bool businessProofAdded = false;
+  Uint8List? panBytes;
+  String? panFileName;
+  Uint8List? aadhaarBytes;
+  String? aadhaarFileName;
+  Uint8List? businessProofBytes;
+  String? businessProofFileName;
+  List<Uint8List> salonPhotoBytes = [];
 
   // Step 4: Salon Details
   late TextEditingController _salonNameController;
@@ -259,21 +268,76 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
   }
 
-  void _addPhoto() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Salon photo uploaded successfully!'), backgroundColor: ZalonoTheme.primary),
-    );
+  Future<void> _pickSalonPhoto({int? index}) async {
+    try {
+      final picked = await FileUploadHelper.pickImageFile();
+      if (picked != null) {
+        setState(() {
+          if (index != null && index < salonPhotoBytes.length) {
+            salonPhotoBytes[index] = picked.bytes;
+          } else {
+            salonPhotoBytes.add(picked.bytes);
+          }
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Salon photo uploaded: ${picked.name}'),
+              backgroundColor: ZalonoTheme.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not pick photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
-  void _uploadDoc(String title) {
-    setState(() {
-      if (title.contains('PAN')) panAdded = true;
-      if (title.contains('Aadhaar')) aadhaarAdded = true;
-      if (title.contains('Business')) businessProofAdded = true;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$title marked as added.'), backgroundColor: ZalonoTheme.primary),
-    );
+  Future<void> _pickDocument(String title) async {
+    try {
+      final picked = await FileUploadHelper.pickDocumentFile();
+      if (picked != null) {
+        setState(() {
+          if (title.contains('PAN')) {
+            panAdded = true;
+            panBytes = picked.bytes;
+            panFileName = picked.name;
+          } else if (title.contains('Aadhaar')) {
+            aadhaarAdded = true;
+            aadhaarBytes = picked.bytes;
+            aadhaarFileName = picked.name;
+          } else if (title.contains('Business')) {
+            businessProofAdded = true;
+            businessProofBytes = picked.bytes;
+            businessProofFileName = picked.name;
+          }
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$title uploaded: ${picked.name}'),
+              backgroundColor: ZalonoTheme.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not pick document: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _nextStep() {
@@ -433,8 +497,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Verify your mobile\nnumber',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary, height: 1.2),
+          'Verify your mobile number',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ZalonoTheme.textPrimary, height: 1.2),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -573,7 +637,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       children: [
         const Text(
           'Enter your onboarding\ncode',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary, height: 1.2),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ZalonoTheme.textPrimary, height: 1.2),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -698,11 +762,61 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           ],
         ),
         const SizedBox(height: 10),
-        _buildDocRow('PAN card', panAdded),
-        const SizedBox(height: 8),
-        _buildDocRow('Aadhaar card', aadhaarAdded),
-        const SizedBox(height: 8),
-        _buildDocRow('Business proof\nShop licence or Udyam', businessProofAdded),
+        _buildDocCard(
+          title: 'PAN card',
+          added: panAdded,
+          fileBytes: panBytes,
+          fileName: panFileName,
+          onUpload: () => _pickDocument('PAN card'),
+          onPreview: () => _showDocPreviewSheet(
+            'PAN card',
+            panBytes,
+            panFileName,
+            () => _pickDocument('PAN card'),
+            () => setState(() {
+              panAdded = false;
+              panBytes = null;
+              panFileName = null;
+            }),
+          ),
+        ),
+        _buildDocCard(
+          title: 'Aadhaar card',
+          added: aadhaarAdded,
+          fileBytes: aadhaarBytes,
+          fileName: aadhaarFileName,
+          onUpload: () => _pickDocument('Aadhaar card'),
+          onPreview: () => _showDocPreviewSheet(
+            'Aadhaar card',
+            aadhaarBytes,
+            aadhaarFileName,
+            () => _pickDocument('Aadhaar card'),
+            () => setState(() {
+              aadhaarAdded = false;
+              aadhaarBytes = null;
+              aadhaarFileName = null;
+            }),
+          ),
+        ),
+        _buildDocCard(
+          title: 'Business proof',
+          subtitle: 'Shop licence or Udyam',
+          added: businessProofAdded,
+          fileBytes: businessProofBytes,
+          fileName: businessProofFileName,
+          onUpload: () => _pickDocument('Business proof'),
+          onPreview: () => _showDocPreviewSheet(
+            'Business proof',
+            businessProofBytes,
+            businessProofFileName,
+            () => _pickDocument('Business proof'),
+            () => setState(() {
+              businessProofAdded = false;
+              businessProofBytes = null;
+              businessProofFileName = null;
+            }),
+          ),
+        ),
         const SizedBox(height: 20),
         const Text('GST NUMBER · optional', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
@@ -775,32 +889,243 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     );
   }
 
-  Widget _buildDocRow(String title, bool added) {
+  Widget _buildDocCard({
+    required String title,
+    String? subtitle,
+    required bool added,
+    Uint8List? fileBytes,
+    String? fileName,
+    required VoidCallback onUpload,
+    required VoidCallback onPreview,
+  }) {
     return GestureDetector(
-      onTap: () => _uploadDoc(title),
+      onTap: added ? onPreview : onUpload,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: ZalonoTheme.border),
+        ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(8)),
-              child: const Icon(Icons.description_outlined, color: ZalonoTheme.primary, size: 20),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDE8EC),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.article_outlined,
+                  color: ZalonoTheme.primary,
+                  size: 22,
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
-            Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700))),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1E1E1E),
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF6B6864),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
             added
                 ? Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(border: Border.all(color: ZalonoTheme.primary), borderRadius: BorderRadius.circular(20)),
-                    child: const Text('✓ Added', style: TextStyle(color: ZalonoTheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: ZalonoTheme.primary, width: 1.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check, size: 14, color: ZalonoTheme.primary),
+                        SizedBox(width: 4),
+                        Text(
+                          'Added',
+                          style: TextStyle(
+                            color: ZalonoTheme.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(20)),
-                    child: const Text('Upload', style: TextStyle(color: ZalonoTheme.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDE8EC),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Upload',
+                      style: TextStyle(
+                        color: ZalonoTheme.primary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDocPreviewSheet(String title, Uint8List? bytes, String? fileName, VoidCallback onReplace, VoidCallback onRemove) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E)),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (bytes != null) ...[
+              if (fileName?.toLowerCase().endsWith('.pdf') == true)
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDE8EC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFF0BDC6)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.picture_as_pdf_rounded, color: ZalonoTheme.primary, size: 48),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          fileName ?? 'PDF Document',
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E), fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.memory(
+                    bytes,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              const SizedBox(height: 10),
+            ] else ...[
+              Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDE8EC),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle_outline, color: ZalonoTheme.primary, size: 36),
+                    SizedBox(height: 6),
+                    Text('Document on file', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+            if (fileName != null)
+              Text(
+                'File: $fileName',
+                style: const TextStyle(fontSize: 13, color: Color(0xFF6B6864), fontWeight: FontWeight.w500),
+              ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      onReplace();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: ZalonoTheme.primary),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('Replace Photo', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      onRemove();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFDE8EC),
+                      foregroundColor: ZalonoTheme.primary,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('Remove', style: TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -818,14 +1143,14 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         const SizedBox(height: 10),
         Row(
           children: [
-            _buildPhotoBox('Cover', true),
+            _buildPhotoBox(0, 'Cover', true),
             const SizedBox(width: 10),
-            _buildPhotoBox(null, false),
+            _buildPhotoBox(1, null, false),
             const SizedBox(width: 10),
-            _buildPhotoBox(null, false),
+            _buildPhotoBox(2, null, false),
             const SizedBox(width: 10),
             GestureDetector(
-              onTap: _addPhoto,
+              onTap: () => _pickSalonPhoto(),
               child: Container(
                 width: 70,
                 height: 70,
@@ -946,23 +1271,43 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     );
   }
 
-  Widget _buildPhotoBox(String? label, bool isCover) {
-    return Container(
-      width: 70,
-      height: 70,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9B5B8),
-        borderRadius: BorderRadius.circular(14),
+  Widget _buildPhotoBox(int index, String? label, bool isCover) {
+    final hasPhoto = index < salonPhotoBytes.length;
+    return GestureDetector(
+      onTap: () => _pickSalonPhoto(index: hasPhoto ? index : null),
+      child: Container(
+        width: 70,
+        height: 70,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9B5B8),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (hasPhoto)
+              Positioned.fill(
+                child: Image.memory(
+                  salonPhotoBytes[index],
+                  fit: BoxFit.cover,
+                ),
+              )
+            else
+              const Icon(Icons.add_photo_alternate_outlined, color: Colors.white70, size: 24),
+            if (isCover)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+                  child: const Text('Cover', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
+                ),
+              ),
+          ],
+        ),
       ),
-      alignment: Alignment.bottomCenter,
-      child: isCover
-          ? Container(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-              child: const Text('Cover', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
-            )
-          : null,
     );
   }
 

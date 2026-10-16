@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
 import '../widgets/zalono_switch.dart';
 import 'stylists_screen.dart';
@@ -281,24 +282,47 @@ class SalonProfileScreen extends StatelessWidget {
 
                       // Photos row
                       Row(
-                        children: [
-                          const Color(0xFFEBC7C0),
-                          const Color(0xFFE2A69D),
-                          const Color(0xFFF4DDD6),
-                        ].map((color) {
+                        children: List.generate(3, (index) {
+                          final photo = index < state.salonPhotos.length ? state.salonPhotos[index] : null;
+                          final fallbackColors = [
+                            const Color(0xFFEBC7C0),
+                            const Color(0xFFE2A69D),
+                            const Color(0xFFF4DDD6),
+                          ];
                           return Expanded(
-                            child: Container(
-                              height: 76,
-                              margin: EdgeInsets.only(
-                                right: color == const Color(0xFFF4DDD6) ? 0 : 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: color,
-                                borderRadius: BorderRadius.circular(18),
+                            child: GestureDetector(
+                              onTap: () async {
+                                final picked = await FileUploadHelper.pickImageFile();
+                                if (picked != null) {
+                                  if (context.mounted) {
+                                    context.read<SalonAppState>().addSalonPhoto(picked.bytes);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Salon photo added: ${picked.name}'),
+                                        backgroundColor: ZalonoTheme.primary,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              child: Container(
+                                height: 76,
+                                margin: EdgeInsets.only(right: index == 2 ? 0 : 10),
+                                decoration: BoxDecoration(
+                                  color: fallbackColors[index % fallbackColors.length],
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: photo != null
+                                    ? Image.memory(photo, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                                    : const Center(
+                                        child: Icon(Icons.add_photo_alternate_outlined, size: 22, color: Color(0xFF8A5A53)),
+                                      ),
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ),
                       const SizedBox(height: 18),
 
@@ -425,10 +449,52 @@ class SalonProfileScreen extends StatelessWidget {
 class OwnerProfileScreen extends StatelessWidget {
   const OwnerProfileScreen({super.key});
 
+  Future<void> _pickAndSaveDocument(BuildContext context, String docName) async {
+    try {
+      final picked = await FileUploadHelper.pickDocumentFile();
+      if (picked != null) {
+        if (context.mounted) {
+          context.read<SalonAppState>().setDocument(docName, picked.bytes, picked.name);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$docName uploaded: ${picked.name}'),
+              backgroundColor: ZalonoTheme.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not pick document: $e'),
+            backgroundColor: ZalonoTheme.primary,
+          ),
+        );
+      }
+    }
+  }
+
   void _showDocumentSheet(BuildContext context, String docName, bool added) {
+    final state = context.read<SalonAppState>();
+    Uint8List? docBytes;
+    String? fileName;
+    if (docName.toLowerCase().contains('pan')) {
+      docBytes = state.panCardBytes;
+      fileName = state.panCardFileName;
+    } else if (docName.toLowerCase().contains('aadhaar')) {
+      docBytes = state.aadhaarBytes;
+      fileName = state.aadhaarFileName;
+    } else if (docName.toLowerCase().contains('business')) {
+      docBytes = state.businessProofBytes;
+      fileName = state.businessProofFileName;
+    }
+    final isAdded = added || docBytes != null;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
@@ -448,26 +514,85 @@ class OwnerProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              added ? 'Document verified and on file.' : 'Document has not been uploaded yet.',
+              isAdded
+                  ? (fileName != null ? 'File: $fileName' : 'Document uploaded and on file.')
+                  : 'Upload a clear photo or PDF of your $docName from local storage.',
               style: const TextStyle(color: ZalonoTheme.textSecondary, fontSize: 14),
             ),
+            if (docBytes != null) ...[
+              const SizedBox(height: 16),
+              if (fileName?.toLowerCase().endsWith('.pdf') == true)
+                Container(
+                  height: 140,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDE8EC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFF0BDC6)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.picture_as_pdf_rounded, color: ZalonoTheme.primary, size: 48),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          fileName ?? 'PDF Document',
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E), fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.memory(
+                    docBytes,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+            ],
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               height: 48,
-              child: ElevatedButton(
-                onPressed: () {
+              child: ElevatedButton.icon(
+                onPressed: () async {
                   Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Document update requested for $docName.'),
-                      backgroundColor: ZalonoTheme.primary,
-                    ),
-                  );
+                  await _pickAndSaveDocument(context, docName);
                 },
-                child: Text(added ? 'Update Document' : 'Upload Document'),
+                icon: const Icon(Icons.upload_file, size: 20),
+                label: Text(isAdded ? 'Replace Photo from Storage' : 'Upload Photo from Storage'),
               ),
             ),
+            if (isAdded) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton(
+                  onPressed: () {
+                    context.read<SalonAppState>().removeDocument(docName);
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$docName removed')),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: ZalonoTheme.primary,
+                    side: const BorderSide(color: ZalonoTheme.primary),
+                  ),
+                  child: const Text('Remove Document'),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -636,7 +761,7 @@ class OwnerProfileScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    state.gstNumber.isNotEmpty ? state.gstNumber : '22ABCDE1234F1Z5',
+                                    state.gstNumber.isNotEmpty ? state.gstNumber : '',
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w800,

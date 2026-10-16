@@ -26,10 +26,10 @@ class WelcomeScreen extends StatelessWidget {
               Row(
                 children: [
                   const Text(
-                    'zalono',
+                    'Zalono',
                     style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 38,
+                      fontWeight: FontWeight.bold,
                       color: ZalonoTheme.primary,
                       letterSpacing: -0.5,
                     ),

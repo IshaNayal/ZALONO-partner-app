@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 
@@ -14,7 +15,60 @@ class SalonAppState extends ChangeNotifier {
   bool panCardAdded = true;
   bool aadhaarAdded = false;
   bool businessProofAdded = false;
+  Uint8List? panCardBytes;
+  String? panCardFileName;
+  Uint8List? aadhaarBytes;
+  String? aadhaarFileName;
+  Uint8List? businessProofBytes;
+  String? businessProofFileName;
+  List<Uint8List> salonPhotos = [];
   int salonServicesCount = 4;
+
+  void setDocument(String docType, Uint8List bytes, String fileName) {
+    if (docType.contains('PAN')) {
+      panCardAdded = true;
+      panCardBytes = bytes;
+      panCardFileName = fileName;
+    } else if (docType.contains('Aadhaar')) {
+      aadhaarAdded = true;
+      aadhaarBytes = bytes;
+      aadhaarFileName = fileName;
+    } else if (docType.contains('Business')) {
+      businessProofAdded = true;
+      businessProofBytes = bytes;
+      businessProofFileName = fileName;
+    }
+    notifyListeners();
+  }
+
+  void removeDocument(String docType) {
+    if (docType.contains('PAN')) {
+      panCardAdded = false;
+      panCardBytes = null;
+      panCardFileName = null;
+    } else if (docType.contains('Aadhaar')) {
+      aadhaarAdded = false;
+      aadhaarBytes = null;
+      aadhaarFileName = null;
+    } else if (docType.contains('Business')) {
+      businessProofAdded = false;
+      businessProofBytes = null;
+      businessProofFileName = null;
+    }
+    notifyListeners();
+  }
+
+  void addSalonPhoto(Uint8List bytes) {
+    salonPhotos.add(bytes);
+    notifyListeners();
+  }
+
+  void removeSalonPhoto(int index) {
+    if (index >= 0 && index < salonPhotos.length) {
+      salonPhotos.removeAt(index);
+      notifyListeners();
+    }
+  }
 
   // Operational State
   bool isAcceptingBookings = true;
