@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/app_state.dart';
 import '../theme/app_theme.dart';
 import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
@@ -88,21 +90,42 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   @override
   void initState() {
     super.initState();
-    _phoneController = TextEditingController(text: '98765 43210');
+    final state = context.read<SalonAppState>();
+
+    _phoneController = TextEditingController(text: state.ownerPhone.isNotEmpty ? state.ownerPhone : '98765 43210');
     _otpControllers = List.generate(6, (_) => TextEditingController());
     _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
     _onboardingCodeController = TextEditingController(text: 'ZL-4821');
 
-    _ownerNameController = TextEditingController(text: 'Rohan Mehta');
-    _emailController = TextEditingController(text: 'rohan@glowstudio.in');
-    _gstController = TextEditingController(text: '22ABCDE1234F1Z5');
+    _ownerNameController = TextEditingController(text: state.ownerName.isNotEmpty ? state.ownerName : '');
+    _emailController = TextEditingController(text: state.ownerEmail.isNotEmpty ? state.ownerEmail : 'rohan@glowstudio.in');
+    _gstController = TextEditingController(text: state.gstNumber.isNotEmpty ? state.gstNumber : '22ABCDE1234F1Z5');
 
-    _salonNameController = TextEditingController(text: 'Glow Studio');
+    _salonNameController = TextEditingController(text: state.salonName.isNotEmpty ? state.salonName : 'Glow Studio');
     _customCategoryController = TextEditingController(text: 'Kids salon');
 
-    _addressController = TextEditingController(text: 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar');
+    _addressController = TextEditingController(text: state.address.isNotEmpty ? state.address : 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar');
     _pincodeController = TextEditingController(text: '751007');
+
+    if (state.salonPhotos.isNotEmpty) {
+      salonPhotoBytes = List.from(state.salonPhotos);
+    }
+    if (state.panCardBytes != null) {
+      panBytes = state.panCardBytes;
+      panFileName = state.panCardFileName;
+      panAdded = true;
+    }
+    if (state.aadhaarBytes != null) {
+      aadhaarBytes = state.aadhaarBytes;
+      aadhaarFileName = state.aadhaarFileName;
+      aadhaarAdded = true;
+    }
+    if (state.businessProofBytes != null) {
+      businessProofBytes = state.businessProofBytes;
+      businessProofFileName = state.businessProofFileName;
+      businessProofAdded = true;
+    }
   }
 
   @override
@@ -273,13 +296,19 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       final picked = await FileUploadHelper.pickImageFile();
       if (picked != null) {
         setState(() {
-          if (index != null && index < salonPhotoBytes.length) {
+          if (index != null) {
+            while (salonPhotoBytes.length <= index) {
+              salonPhotoBytes.add(Uint8List(0));
+            }
             salonPhotoBytes[index] = picked.bytes;
           } else {
             salonPhotoBytes.add(picked.bytes);
           }
         });
         if (mounted) {
+          final activePhotos = salonPhotoBytes.where((p) => p.isNotEmpty).toList();
+          // Immediately update SalonAppState so it is available in More -> Salon profile!
+          context.read<SalonAppState>().setSalonPhotos(activePhotos);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Salon photo uploaded: ${picked.name}'),
@@ -320,6 +349,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           }
         });
         if (mounted) {
+          context.read<SalonAppState>().setDocument(title, picked.bytes, picked.name);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$title uploaded: ${picked.name}'),
@@ -350,6 +380,20 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       );
       return;
     }
+
+    final activePhotos = salonPhotoBytes.where((p) => p.isNotEmpty).toList();
+    // Sync all currently entered registration details to SalonAppState
+    context.read<SalonAppState>().updateSalonRegistrationDetails(
+      name: _salonNameController.text.trim(),
+      category: salonCategory,
+      serves: salonServes.join(', '),
+      fullAddress: '${_addressController.text.trim()} ${_pincodeController.text.trim()}'.trim(),
+      owner: _ownerNameController.text.trim(),
+      phone: _phoneController.text.trim(),
+      email: _emailController.text.trim(),
+      gst: _gstController.text.trim(),
+      photos: activePhotos,
+    );
 
     if (_currentStep == 3) {
       if (!_isVerifyingEmail && !emailVerified) {
@@ -636,7 +680,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Enter your onboarding\ncode',
+          'Enter your onboarding code',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ZalonoTheme.textPrimary, height: 1.2),
         ),
         const SizedBox(height: 8),
@@ -777,6 +821,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               panAdded = false;
               panBytes = null;
               panFileName = null;
+              context.read<SalonAppState>().removeDocument('PAN card');
             }),
           ),
         ),
@@ -795,6 +840,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               aadhaarAdded = false;
               aadhaarBytes = null;
               aadhaarFileName = null;
+              context.read<SalonAppState>().removeDocument('Aadhaar card');
             }),
           ),
         ),
@@ -814,6 +860,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               businessProofAdded = false;
               businessProofBytes = null;
               businessProofFileName = null;
+              context.read<SalonAppState>().removeDocument('Business proof');
             }),
           ),
         ),
@@ -1141,27 +1188,39 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         const SizedBox(height: 20),
         const Text('SALON PHOTOS · 3 TO 5', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            _buildPhotoBox(0, 'Cover', true),
-            const SizedBox(width: 10),
-            _buildPhotoBox(1, null, false),
-            const SizedBox(width: 10),
-            _buildPhotoBox(2, null, false),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: () => _pickSalonPhoto(),
-              child: Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  border: Border.all(color: ZalonoTheme.primary, style: BorderStyle.solid),
-                  borderRadius: BorderRadius.circular(14),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              _buildPhotoBox(0, 'Cover', true),
+              const SizedBox(width: 10),
+              _buildPhotoBox(1, null, false),
+              const SizedBox(width: 10),
+              _buildPhotoBox(2, null, false),
+              if (salonPhotoBytes.length > 3)
+                ...List.generate(salonPhotoBytes.length - 3, (extraIdx) {
+                  final idx = 3 + extraIdx;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: _buildPhotoBox(idx, null, false),
+                  );
+                }),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => _pickSalonPhoto(),
+                child: Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: ZalonoTheme.primary, style: BorderStyle.solid),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.add, color: ZalonoTheme.primary),
                 ),
-                child: const Icon(Icons.add, color: ZalonoTheme.primary),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 24),
         const Text('SALON NAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
@@ -1272,9 +1331,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   }
 
   Widget _buildPhotoBox(int index, String? label, bool isCover) {
-    final hasPhoto = index < salonPhotoBytes.length;
+    final hasPhoto = index < salonPhotoBytes.length && salonPhotoBytes[index].isNotEmpty;
     return GestureDetector(
-      onTap: () => _pickSalonPhoto(index: hasPhoto ? index : null),
+      onTap: () => _pickSalonPhoto(index: index),
       child: Container(
         width: 70,
         height: 70,
@@ -1797,7 +1856,20 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
               const Spacer(),
               ElevatedButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                onPressed: () {
+                  context.read<SalonAppState>().updateSalonRegistrationDetails(
+                    name: _salonNameController.text.trim(),
+                    category: salonCategory,
+                    serves: salonServes.join(', '),
+                    fullAddress: '${_addressController.text.trim()} ${_pincodeController.text.trim()}'.trim(),
+                    owner: _ownerNameController.text.trim(),
+                    phone: _phoneController.text.trim(),
+                    email: _emailController.text.trim(),
+                    gst: _gstController.text.trim(),
+                    photos: salonPhotoBytes.where((p) => p.isNotEmpty).toList(),
+                  );
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
                 child: const Text('Done'),
               ),
             ],

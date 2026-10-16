@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import '../utils/app_storage.dart';
 
 class SalonAppState extends ChangeNotifier {
   // Salon Information
@@ -8,7 +10,7 @@ class SalonAppState extends ChangeNotifier {
   String salonCategory = 'Premium';
   String salonServes = 'Unisex, Kids salon';
   String address = 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar 751007';
-  String ownerName = 'Rohan Mehta';
+  String ownerName = '';
   String ownerPhone = '+91 98765 43210';
   String ownerEmail = 'rohan@glowstudio.in';
   String gstNumber = '22ABCDE1234F1Z5';
@@ -24,19 +26,78 @@ class SalonAppState extends ChangeNotifier {
   List<Uint8List> salonPhotos = [];
   int salonServicesCount = 4;
 
+  SalonAppState() {
+    _loadPersistedState();
+  }
+
+  void _loadPersistedState() {
+    try {
+      final savedPhotos = AppStorage.loadString('salon_photos');
+      if (savedPhotos != null && savedPhotos.isNotEmpty) {
+        final List decoded = jsonDecode(savedPhotos);
+        salonPhotos = decoded.map((s) => base64Decode(s as String)).toList();
+      }
+      final savedPan = AppStorage.loadString('pan_bytes');
+      if (savedPan != null && savedPan.isNotEmpty) {
+        panCardBytes = base64Decode(savedPan);
+        panCardFileName = AppStorage.loadString('pan_name') ?? 'pan_card.jpg';
+        panCardAdded = true;
+      }
+      final savedAadhaar = AppStorage.loadString('aadhaar_bytes');
+      if (savedAadhaar != null && savedAadhaar.isNotEmpty) {
+        aadhaarBytes = base64Decode(savedAadhaar);
+        aadhaarFileName = AppStorage.loadString('aadhaar_name') ?? 'aadhaar_card.jpg';
+        aadhaarAdded = true;
+      }
+      final savedBusiness = AppStorage.loadString('business_bytes');
+      if (savedBusiness != null && savedBusiness.isNotEmpty) {
+        businessProofBytes = base64Decode(savedBusiness);
+        businessProofFileName = AppStorage.loadString('business_name') ?? 'business_proof.jpg';
+        businessProofAdded = true;
+      }
+      final savedName = AppStorage.loadString('salon_name');
+      if (savedName != null && savedName.isNotEmpty) salonName = savedName;
+      final savedCategory = AppStorage.loadString('salon_category');
+      if (savedCategory != null && savedCategory.isNotEmpty) salonCategory = savedCategory;
+      final savedAddress = AppStorage.loadString('salon_address');
+      if (savedAddress != null && savedAddress.isNotEmpty) address = savedAddress;
+      final savedOwner = AppStorage.loadString('owner_name');
+      if (savedOwner != null && savedOwner.isNotEmpty) ownerName = savedOwner;
+      final savedPhone = AppStorage.loadString('owner_phone');
+      if (savedPhone != null && savedPhone.isNotEmpty) ownerPhone = savedPhone;
+    } catch (e) {
+      debugPrint('Error loading persisted state: $e');
+    }
+  }
+
+  void _persistPhotos() {
+    try {
+      final encoded = jsonEncode(salonPhotos.map(base64Encode).toList());
+      AppStorage.saveString('salon_photos', encoded);
+    } catch (e) {
+      debugPrint('Error persisting photos: $e');
+    }
+  }
+
   void setDocument(String docType, Uint8List bytes, String fileName) {
     if (docType.contains('PAN')) {
       panCardAdded = true;
       panCardBytes = bytes;
       panCardFileName = fileName;
+      AppStorage.saveString('pan_bytes', base64Encode(bytes));
+      AppStorage.saveString('pan_name', fileName);
     } else if (docType.contains('Aadhaar')) {
       aadhaarAdded = true;
       aadhaarBytes = bytes;
       aadhaarFileName = fileName;
+      AppStorage.saveString('aadhaar_bytes', base64Encode(bytes));
+      AppStorage.saveString('aadhaar_name', fileName);
     } else if (docType.contains('Business')) {
       businessProofAdded = true;
       businessProofBytes = bytes;
       businessProofFileName = fileName;
+      AppStorage.saveString('business_bytes', base64Encode(bytes));
+      AppStorage.saveString('business_name', fileName);
     }
     notifyListeners();
   }
@@ -46,28 +107,90 @@ class SalonAppState extends ChangeNotifier {
       panCardAdded = false;
       panCardBytes = null;
       panCardFileName = null;
+      AppStorage.saveString('pan_bytes', '');
     } else if (docType.contains('Aadhaar')) {
       aadhaarAdded = false;
       aadhaarBytes = null;
       aadhaarFileName = null;
+      AppStorage.saveString('aadhaar_bytes', '');
     } else if (docType.contains('Business')) {
       businessProofAdded = false;
       businessProofBytes = null;
       businessProofFileName = null;
+      AppStorage.saveString('business_bytes', '');
     }
     notifyListeners();
   }
 
   void addSalonPhoto(Uint8List bytes) {
     salonPhotos.add(bytes);
+    _persistPhotos();
+    notifyListeners();
+  }
+
+  void setSalonPhotos(List<Uint8List> photos) {
+    salonPhotos = List.from(photos);
+    _persistPhotos();
+    notifyListeners();
+  }
+
+  void updateSalonPhoto(int index, Uint8List bytes) {
+    if (index >= 0 && index < salonPhotos.length) {
+      salonPhotos[index] = bytes;
+    } else {
+      salonPhotos.add(bytes);
+    }
+    _persistPhotos();
     notifyListeners();
   }
 
   void removeSalonPhoto(int index) {
     if (index >= 0 && index < salonPhotos.length) {
       salonPhotos.removeAt(index);
+      _persistPhotos();
       notifyListeners();
     }
+  }
+
+  void updateSalonRegistrationDetails({
+    String? name,
+    String? category,
+    String? serves,
+    String? fullAddress,
+    String? owner,
+    String? phone,
+    String? email,
+    String? gst,
+    List<Uint8List>? photos,
+  }) {
+    if (name != null && name.isNotEmpty) {
+      salonName = name;
+      AppStorage.saveString('salon_name', name);
+    }
+    if (category != null && category.isNotEmpty) {
+      salonCategory = category;
+      AppStorage.saveString('salon_category', category);
+    }
+    if (serves != null && serves.isNotEmpty) salonServes = serves;
+    if (fullAddress != null && fullAddress.isNotEmpty) {
+      address = fullAddress;
+      AppStorage.saveString('salon_address', fullAddress);
+    }
+    if (owner != null && owner.isNotEmpty) {
+      ownerName = owner;
+      AppStorage.saveString('owner_name', owner);
+    }
+    if (phone != null && phone.isNotEmpty) {
+      ownerPhone = phone;
+      AppStorage.saveString('owner_phone', phone);
+    }
+    if (email != null && email.isNotEmpty) ownerEmail = email;
+    if (gst != null) gstNumber = gst;
+    if (photos != null && photos.isNotEmpty) {
+      salonPhotos = List.from(photos);
+      _persistPhotos();
+    }
+    notifyListeners();
   }
 
   // Operational State
