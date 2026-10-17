@@ -804,6 +804,11 @@ class SalonAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeStylist(String stylistId) {
+    stylists.removeWhere((s) => s.id == stylistId);
+    notifyListeners();
+  }
+
   void turnOffStylist(String stylistName, String duration, String? reassignTarget) {
     final index = stylists.indexWhere((s) => s.name.toLowerCase().contains(stylistName.toLowerCase()));
     if (index != -1) {

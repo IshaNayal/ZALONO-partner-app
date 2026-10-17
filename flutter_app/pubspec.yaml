@@ -26,3 +26,16 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+  fonts:
+    - family: Plus Jakarta Sans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans[wght].ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans[wght].ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans[wght].ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans[wght].ttf
+          weight: 800
+        - asset: assets/fonts/PlusJakartaSans[wght].ttf
+          weight: 900

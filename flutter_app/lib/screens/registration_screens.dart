@@ -15,6 +15,8 @@ class RegistrationFlowScreen extends StatefulWidget {
 }
 
 class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
+  late final ScrollController _registrationScrollController;
+  bool _registrationLayoutReady = false;
   int _currentStep = 1; // 1 to 9 (R2 to R11), and 10 is R12 Submitted
   bool _isVerifyingEmail = false; // Sub-step on Step 3 for R5 Verify email
 
@@ -100,6 +102,23 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   @override
   void initState() {
     super.initState();
+    _registrationScrollController = ScrollController(keepScrollOffset: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        if (_registrationScrollController.hasClients) {
+          _registrationScrollController.jumpTo(0);
+        }
+        setState(() {
+          _registrationLayoutReady = true;
+        });
+      });
+    });
     final state = context.read<SalonAppState>();
 
     _phoneController = TextEditingController(text: state.ownerPhone.isNotEmpty ? state.ownerPhone : '98765 43210');
@@ -107,6 +126,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
     _onboardingCodeController = TextEditingController(text: 'ZL-4821');
+    _onboardingCodeController.addListener(_verifyOnboardingCode);
+    _verifyOnboardingCode();
 
     _ownerNameController = TextEditingController(text: state.ownerName.isNotEmpty ? state.ownerName : '');
     _emailController = TextEditingController(text: state.ownerEmail.isNotEmpty ? state.ownerEmail : 'rohan@glowstudio.in');
@@ -160,6 +181,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   @override
   void dispose() {
+    _registrationScrollController.dispose();
     _phoneController.dispose();
     for (var c in _otpControllers) {
       c.dispose();
@@ -167,6 +189,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     for (var f in _otpFocusNodes) {
       f.dispose();
     }
+    _onboardingCodeController.removeListener(_verifyOnboardingCode);
     _onboardingCodeController.dispose();
     _ownerNameController.dispose();
     _emailController.dispose();
@@ -183,6 +206,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     setState(() {
       _isNumberVerified = (code == '123456');
     });
+  }
+
+  void _verifyOnboardingCode() {
+    final isVerified = _onboardingCodeController.text.trim() == 'ZL-4821';
+    if (codeVerified != isVerified && mounted) {
+      setState(() {
+        codeVerified = isVerified;
+      });
+    } else {
+      codeVerified = isVerified;
+    }
   }
 
   void _useCurrentLocation() {
@@ -496,15 +530,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
   }
 
-  bool get _hasRequiredDocuments =>
-      panBytes != null &&
-      panBytes!.isNotEmpty &&
-      aadhaarBytes != null &&
-      aadhaarBytes!.isNotEmpty &&
-      businessProofBytes != null &&
-      businessProofBytes!.isNotEmpty;
-
   bool get _isCurrentStepComplete {
+    if (_isVerifyingEmail) {
+      return true;
+    }
     switch (_currentStep) {
       case 1:
         return _isNumberVerified;
@@ -512,8 +541,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         return codeVerified && _onboardingCodeController.text.trim().isNotEmpty;
       case 3:
         return _ownerNameController.text.trim().isNotEmpty &&
-            _emailController.text.trim().isNotEmpty &&
-            _hasRequiredDocuments;
+            _emailController.text.trim().isNotEmpty;
       case 4:
         return salonPhotoBytes.where((photo) => photo.isNotEmpty).length >= 3 &&
             _salonNameController.text.trim().isNotEmpty &&
@@ -569,21 +597,30 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     if (_currentStep == 3) {
       if (!_isVerifyingEmail && !emailVerified) {
         // Go to R5 Verify email
-        setState(() => _isVerifyingEmail = true);
+        setState(() {
+          _isVerifyingEmail = true;
+          _registrationScrollController.jumpTo(0);
+        });
         return;
       }
       if (_isVerifyingEmail) {
         setState(() {
           emailVerified = true;
           _isVerifyingEmail = false;
-          _currentStep = 4;
+          if (_ownerNameController.text.trim().isNotEmpty) {
+            _currentStep = 4;
+          }
+          _registrationScrollController.jumpTo(0);
         });
         return;
       }
     }
 
     if (_currentStep < 10) {
-      setState(() => _currentStep++);
+      setState(() {
+        _currentStep++;
+        _registrationScrollController.jumpTo(0);
+      });
     }
   }
 
@@ -593,7 +630,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       return;
     }
     if (_currentStep > 1) {
-      setState(() => _currentStep--);
+      setState(() {
+        _currentStep--;
+        _registrationScrollController.jumpTo(0);
+      });
     } else {
       Navigator.pop(context);
     }
@@ -601,6 +641,16 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_registrationLayoutReady) {
+      return const Scaffold(
+        backgroundColor: ZalonoTheme.background,
+        body: ColoredBox(
+          color: ZalonoTheme.background,
+          child: Center(),
+        ),
+      );
+    }
+
     if (_currentStep == 10) {
       return _buildR12Submitted();
     }
@@ -653,6 +703,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  controller: _registrationScrollController,
+                  primary: false,
                   child: _buildStepContent(),
                 ),
               ),
@@ -736,6 +788,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         const Text('MOBILE NUMBER', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
+          height: 56,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -768,46 +821,53 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         const SizedBox(height: 24),
         const Text('ENTER THE 6-DIGIT CODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(6, (index) {
-            final isFocused = _otpFocusNodes[index].hasFocus;
-            final hasVal = _otpControllers[index].text.isNotEmpty;
-            return Container(
-              width: 46,
-              height: 52,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isFocused
-                      ? ZalonoTheme.primary
-                      : (hasVal ? ZalonoTheme.textPrimary : ZalonoTheme.border),
-                  width: isFocused ? 1.8 : 1,
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: Row(
+            children: List.generate(6, (index) {
+              final isFocused = _otpFocusNodes[index].hasFocus;
+              final hasVal = _otpControllers[index].text.isNotEmpty;
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: index == 5 ? 0 : 8),
+                  child: Container(
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isFocused
+                            ? ZalonoTheme.primary
+                            : (hasVal ? ZalonoTheme.textPrimary : ZalonoTheme.border),
+                        width: isFocused ? 1.8 : 1,
+                      ),
+                    ),
+                    child: TextField(
+                      controller: _otpControllers[index],
+                      focusNode: _otpFocusNodes[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      onChanged: (val) {
+                        if (val.isNotEmpty && index < 5) {
+                          _otpFocusNodes[index + 1].requestFocus();
+                        }
+                        _checkOtpVerification();
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              child: TextField(
-                controller: _otpControllers[index],
-                focusNode: _otpFocusNodes[index],
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                maxLength: 1,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  counterText: '',
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: (val) {
-                  if (val.isNotEmpty && index < 5) {
-                    _otpFocusNodes[index + 1].requestFocus();
-                  }
-                  _checkOtpVerification();
-                },
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
         const SizedBox(height: 12),
         if (_isNumberVerified) ...[
@@ -825,34 +885,6 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             child: const Text(
               'Next you will enter an onboarding code from your Zalono executive. Registration stays locked without it.',
               style: TextStyle(color: ZalonoTheme.primaryDark, fontSize: 13, height: 1.4),
-            ),
-          ),
-        ] else ...[
-          Padding(
-            padding: const EdgeInsets.only(top: 6.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Enter dummy code 123456 by hand',
-                    style: TextStyle(color: ZalonoTheme.textSecondary, fontSize: 13),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      for (int i = 0; i < 6; i++) {
-                        _otpControllers[i].text = '${i + 1}';
-                      }
-                      _checkOtpVerification();
-                    },
-                    child: const Text(
-                      'Auto-fill 123456',
-                      style: TextStyle(color: ZalonoTheme.primary, fontSize: 12, fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -910,14 +942,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 12),
-        const Row(
-          children: [
-            Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
-            SizedBox(width: 6),
-            Text('Code verified · registration unlocked', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
-          ],
-        ),
+        if (codeVerified) ...[
+const SizedBox(height: 12),
+        if (codeVerified)
+          const Row(
+            children: [
+              Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
+              SizedBox(width: 6),
+              Text('Code verified · registration unlocked', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ],
         const SizedBox(height: 20),
         GestureDetector(
           onTap: () => ActionDialogs.showSupportSheet(context),

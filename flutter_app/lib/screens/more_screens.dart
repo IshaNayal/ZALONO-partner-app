@@ -18,19 +18,23 @@ class MoreScreen extends StatefulWidget {
 
 class _MoreScreenState extends State<MoreScreen> {
   void _openSalonProfile() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const SalonProfileScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const SalonProfileScreen()));
   }
 
   void _openOwnerProfile() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const OwnerProfileScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const OwnerProfileScreen()));
   }
 
   void _openTimings() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const TimingsScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const TimingsScreen()));
   }
 
   void _openSupport() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const SupportScreen()));
   }
 
   void _showLogoutDialog() {
@@ -48,13 +52,17 @@ class _MoreScreenState extends State<MoreScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Log out of Glow Studio?',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary),
+              '𝗟𝗼𝗴 𝗢𝘂𝘁 ?',
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: ZalonoTheme.textPrimary),
             ),
             const SizedBox(height: 8),
             const Text(
               'You will not get booking alerts on this phone until you log in again.',
-              style: TextStyle(fontSize: 14, color: ZalonoTheme.textSecondary, height: 1.35),
+              style: TextStyle(
+                  fontSize: 14, color: ZalonoTheme.textSecondary, height: 1.35),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -89,7 +97,10 @@ class _MoreScreenState extends State<MoreScreen> {
             children: [
               const Text(
                 'More',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary),
+                style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: ZalonoTheme.textPrimary),
               ),
               const SizedBox(height: 20),
 
@@ -107,8 +118,13 @@ class _MoreScreenState extends State<MoreScreen> {
                       radius: 22,
                       backgroundColor: ZalonoTheme.primaryLight,
                       child: Text(
-                        appState.salonName.isNotEmpty ? appState.salonName[0] : 'S',
-                        style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 20),
+                        appState.salonName.isNotEmpty
+                            ? appState.salonName[0]
+                            : 'S',
+                        style: const TextStyle(
+                            color: ZalonoTheme.primary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 20),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -116,16 +132,30 @@ class _MoreScreenState extends State<MoreScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(appState.salonName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                          Text(appState.salonName,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800)),
                           const SizedBox(height: 2),
-                          Text(appState.address, style: const TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          Text(appState.address,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: ZalonoTheme.textSecondary),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(12)),
-                      child: const Text('✓ Verified', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 11)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: ZalonoTheme.primaryLight,
+                          borderRadius: BorderRadius.circular(12)),
+                      child: const Text('✓ Verified',
+                          style: TextStyle(
+                              color: ZalonoTheme.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11)),
                     ),
                   ],
                 ),
@@ -133,47 +163,62 @@ class _MoreScreenState extends State<MoreScreen> {
               const SizedBox(height: 16),
 
               // Navigation Links
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
+              Material(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: ZalonoTheme.border),
+                  side: const BorderSide(color: ZalonoTheme.border),
                 ),
+                clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
-                    _buildMenuItem(Icons.storefront_outlined, 'Salon profile', _openSalonProfile),
+                    _buildMenuItem(Icons.storefront_outlined, 'Salon profile',
+                        _openSalonProfile),
                     _buildDivider(),
-                    _buildMenuItem(Icons.person_outline, 'Owner profile', _openOwnerProfile),
+                    _buildMenuItem(Icons.person_outline, 'Owner profile',
+                        _openOwnerProfile),
                     _buildDivider(),
                     _buildMenuItem(Icons.groups_outlined, 'Stylists', () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const StylistsScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const StylistsScreen()));
                     }),
                     _buildDivider(),
-                    _buildMenuItem(Icons.schedule_outlined, 'Timings', _openTimings),
+                    _buildMenuItem(
+                        Icons.schedule_outlined, 'Timings', _openTimings),
                     _buildDivider(),
-                    _buildMenuItem(Icons.headset_mic_outlined, 'Support', _openSupport),
+                    _buildMenuItem(
+                        Icons.headset_mic_outlined, 'Support', _openSupport),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
 
               // Log out button
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
+              Material(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: ZalonoTheme.border),
+                  side: const BorderSide(color: ZalonoTheme.border),
                 ),
+                clipBehavior: Clip.antiAlias,
                 child: ListTile(
                   onTap: _showLogoutDialog,
                   leading: const Icon(Icons.logout, color: ZalonoTheme.primary),
-                  title: const Text('Log out', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 15)),
+                  title: const Text('Log out',
+                      style: TextStyle(
+                          color: ZalonoTheme.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15)),
                 ),
               ),
               const SizedBox(height: 32),
 
               const Center(
-                child: Text('Zalono Partner · pilot version 1.0', style: TextStyle(fontSize: 12, color: ZalonoTheme.textMuted)),
+                child: Text('Zalono Partner · pilot version 1.0',
+                    style:
+                        TextStyle(fontSize: 12, color: ZalonoTheme.textMuted)),
               ),
             ],
           ),
@@ -186,12 +231,15 @@ class _MoreScreenState extends State<MoreScreen> {
     return ListTile(
       onTap: onTap,
       leading: Icon(icon, color: ZalonoTheme.primary),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-      trailing: const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
+      title: Text(title,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+      trailing:
+          const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
     );
   }
 
-  Widget _buildDivider() => const Divider(height: 1, indent: 56, endIndent: 16, color: ZalonoTheme.border);
+  Widget _buildDivider() => const Divider(
+      height: 1, indent: 56, endIndent: 16, color: ZalonoTheme.border);
 }
 
 // M2: Salon Profile (View Only)
@@ -211,7 +259,9 @@ class SalonProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 36 > 0 ? constraints.maxHeight - 36 : 0,
+                  minHeight: constraints.maxHeight - 36 > 0
+                      ? constraints.maxHeight - 36
+                      : 0,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
@@ -227,7 +277,8 @@ class SalonProfileScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                            border: Border.all(
+                                color: const Color(0xFFEFE8E1), width: 1.2),
                           ),
                           child: const Center(
                             child: Icon(
@@ -255,7 +306,8 @@ class SalonProfileScreen extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                               color: const Color(0xFFEDE8E3),
                               borderRadius: BorderRadius.circular(14),
@@ -263,7 +315,8 @@ class SalonProfileScreen extends StatelessWidget {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.lock_outline, size: 13, color: Color(0xFF5A5753)),
+                                Icon(Icons.lock_outline,
+                                    size: 13, color: Color(0xFF5A5753)),
                                 SizedBox(width: 4),
                                 Text(
                                   'View only',
@@ -283,7 +336,9 @@ class SalonProfileScreen extends StatelessWidget {
                       // Photos row
                       Row(
                         children: List.generate(3, (index) {
-                          final photo = index < state.salonPhotos.length ? state.salonPhotos[index] : null;
+                          final photo = index < state.salonPhotos.length
+                              ? state.salonPhotos[index]
+                              : null;
                           final fallbackColors = [
                             const Color(0xFFEBC7C0),
                             const Color(0xFFE2A69D),
@@ -292,13 +347,23 @@ class SalonProfileScreen extends StatelessWidget {
                           return Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                final picked = await FileUploadHelper.pickImageFile();
+                                final picked =
+                                    await FileUploadHelper.pickImageFile();
                                 if (picked != null) {
                                   if (context.mounted) {
-                                    context.read<SalonAppState>().addSalonPhoto(picked.bytes);
+                                    if (index < state.salonPhotos.length) {
+                                      context
+                                          .read<SalonAppState>()
+                                          .updateSalonPhoto(index, picked.bytes);
+                                    } else {
+                                      context
+                                          .read<SalonAppState>()
+                                          .addSalonPhoto(picked.bytes);
+                                    }
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Salon photo added: ${picked.name}'),
+                                        content: Text(
+                                            'Salon photo updated: ${picked.name}'),
                                         backgroundColor: ZalonoTheme.primary,
                                       ),
                                     );
@@ -307,17 +372,27 @@ class SalonProfileScreen extends StatelessWidget {
                               },
                               child: Container(
                                 height: 76,
-                                margin: EdgeInsets.only(right: index == 2 ? 0 : 10),
+                                margin:
+                                    EdgeInsets.only(right: index == 2 ? 0 : 10),
                                 decoration: BoxDecoration(
-                                  color: fallbackColors[index % fallbackColors.length],
+                                  color: fallbackColors[
+                                      index % fallbackColors.length],
                                   borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                                  border: Border.all(
+                                      color: const Color(0xFFEFE8E1),
+                                      width: 1.2),
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: photo != null
-                                    ? Image.memory(photo, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                                    ? Image.memory(photo,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: double.infinity)
                                     : const Center(
-                                        child: Icon(Icons.add_photo_alternate_outlined, size: 22, color: Color(0xFF8A5A53)),
+                                        child: Icon(
+                                            Icons.add_photo_alternate_outlined,
+                                            size: 22,
+                                            color: Color(0xFF8A5A53)),
                                       ),
                               ),
                             ),
@@ -332,22 +407,41 @@ class SalonProfileScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                          border: Border.all(
+                              color: const Color(0xFFEFE8E1), width: 1.2),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
                         child: Column(
                           children: [
                             _buildViewRow('Salon name', state.salonName),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildViewRow('Category', state.salonCategory),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildViewRow('Serves', state.salonServes),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildViewRow('Address', state.address),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
-                            _buildViewRow('Services', '${state.salonServicesCount} services'),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
-                            _buildViewRow('Stylists', '${state.stylists.length} people'),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
+                            _buildViewRow('Services',
+                                '${state.salonServicesCount} services'),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
+                            _buildViewRow(
+                                'Stylists', '${state.stylists.length} people'),
                           ],
                         ),
                       ),
@@ -355,7 +449,8 @@ class SalonProfileScreen extends StatelessWidget {
 
                       // Notice Box
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFDE8EC),
                           borderRadius: BorderRadius.circular(16),
@@ -379,10 +474,12 @@ class SalonProfileScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 52,
                         child: OutlinedButton(
-                          onPressed: () => ActionDialogs.showSupportSheet(context),
+                          onPressed: () =>
+                              ActionDialogs.showSupportSheet(context),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: ZalonoTheme.primary,
-                            side: const BorderSide(color: ZalonoTheme.primary, width: 1.8),
+                            side: const BorderSide(
+                                color: ZalonoTheme.primary, width: 1.8),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -449,12 +546,15 @@ class SalonProfileScreen extends StatelessWidget {
 class OwnerProfileScreen extends StatelessWidget {
   const OwnerProfileScreen({super.key});
 
-  Future<void> _pickAndSaveDocument(BuildContext context, String docName) async {
+  Future<void> _pickAndSaveDocument(
+      BuildContext context, String docName) async {
     try {
       final picked = await FileUploadHelper.pickDocumentFile();
       if (picked != null) {
         if (context.mounted) {
-          context.read<SalonAppState>().setDocument(docName, picked.bytes, picked.name);
+          context
+              .read<SalonAppState>()
+              .setDocument(docName, picked.bytes, picked.name);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$docName uploaded: ${picked.name}'),
@@ -508,16 +608,23 @@ class OwnerProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(docName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                Text(docName,
+                    style: const TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w800)),
+                IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(ctx)),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               isAdded
-                  ? (fileName != null ? 'File: $fileName' : 'Document uploaded and on file.')
+                  ? (fileName != null
+                      ? 'File: $fileName'
+                      : 'Document uploaded and on file.')
                   : 'Upload a clear photo or PDF of your $docName from local storage.',
-              style: const TextStyle(color: ZalonoTheme.textSecondary, fontSize: 14),
+              style: const TextStyle(
+                  color: ZalonoTheme.textSecondary, fontSize: 14),
             ),
             if (docBytes != null) ...[
               const SizedBox(height: 16),
@@ -533,7 +640,8 @@ class OwnerProfileScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.picture_as_pdf_rounded, color: ZalonoTheme.primary, size: 48),
+                      const Icon(Icons.picture_as_pdf_rounded,
+                          color: ZalonoTheme.primary, size: 48),
                       const SizedBox(height: 8),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -542,7 +650,10 @@ class OwnerProfileScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E), fontSize: 13),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E1E1E),
+                              fontSize: 13),
                         ),
                       ),
                     ],
@@ -569,7 +680,9 @@ class OwnerProfileScreen extends StatelessWidget {
                   await _pickAndSaveDocument(context, docName);
                 },
                 icon: const Icon(Icons.upload_file, size: 20),
-                label: Text(isAdded ? 'Replace Photo from Storage' : 'Upload Photo from Storage'),
+                label: Text(isAdded
+                    ? 'Replace Photo from Storage'
+                    : 'Upload Photo from Storage'),
               ),
             ),
             if (isAdded) ...[
@@ -612,7 +725,9 @@ class OwnerProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 36 > 0 ? constraints.maxHeight - 36 : 0,
+                  minHeight: constraints.maxHeight - 36 > 0
+                      ? constraints.maxHeight - 36
+                      : 0,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
@@ -628,7 +743,8 @@ class OwnerProfileScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                            border: Border.all(
+                                color: const Color(0xFFEFE8E1), width: 1.2),
                           ),
                           child: const Center(
                             child: Icon(
@@ -656,7 +772,8 @@ class OwnerProfileScreen extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                               color: const Color(0xFFEFEBE6),
                               borderRadius: BorderRadius.circular(14),
@@ -664,7 +781,8 @@ class OwnerProfileScreen extends StatelessWidget {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.lock_outline, size: 13, color: Color(0xFF5A5753)),
+                                Icon(Icons.lock_outline,
+                                    size: 13, color: Color(0xFF5A5753)),
                                 SizedBox(width: 4),
                                 Text(
                                   'View only',
@@ -687,15 +805,23 @@ class OwnerProfileScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                          border: Border.all(
+                              color: const Color(0xFFEFE8E1), width: 1.2),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
                         child: Column(
                           children: [
                             _buildInfoRow('Full name', state.ownerName),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildInfoRow('Mobile (login)', state.ownerPhone),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildInfoRow('Email', state.ownerEmail),
                           ],
                         ),
@@ -721,36 +847,51 @@ class OwnerProfileScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                          border: Border.all(
+                              color: const Color(0xFFEFE8E1), width: 1.2),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
                         child: Column(
                           children: [
                             _buildDocRow(
                               context,
                               'PAN card',
                               state.panCardAdded,
-                              onTap: () => _showDocumentSheet(context, 'PAN card', state.panCardAdded),
+                              onTap: () => _showDocumentSheet(
+                                  context, 'PAN card', state.panCardAdded),
                             ),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildDocRow(
                               context,
                               'Aadhaar card',
                               state.aadhaarAdded,
-                              onTap: () => _showDocumentSheet(context, 'Aadhaar card', state.aadhaarAdded),
+                              onTap: () => _showDocumentSheet(
+                                  context, 'Aadhaar card', state.aadhaarAdded),
                             ),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             _buildDocRow(
                               context,
                               'Business proof',
                               state.businessProofAdded,
-                              onTap: () => _showDocumentSheet(context, 'Business proof', state.businessProofAdded),
+                              onTap: () => _showDocumentSheet(context,
+                                  'Business proof', state.businessProofAdded),
                             ),
-                            const Divider(height: 1, thickness: 1, color: Color(0xFFF3ECE5)),
+                            const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Color(0xFFF3ECE5)),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     'GST number',
@@ -761,7 +902,9 @@ class OwnerProfileScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    state.gstNumber.isNotEmpty ? state.gstNumber : '',
+                                    state.gstNumber.isNotEmpty
+                                        ? state.gstNumber
+                                        : '',
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w800,
@@ -778,7 +921,8 @@ class OwnerProfileScreen extends StatelessWidget {
                       // Notice Box
                       Container(
                         margin: const EdgeInsets.only(top: 16),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFDE8EC),
                           borderRadius: BorderRadius.circular(16),
@@ -802,10 +946,12 @@ class OwnerProfileScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 52,
                         child: OutlinedButton(
-                          onPressed: () => ActionDialogs.showSupportSheet(context),
+                          onPressed: () =>
+                              ActionDialogs.showSupportSheet(context),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: ZalonoTheme.primary,
-                            side: const BorderSide(color: ZalonoTheme.primary, width: 1.8),
+                            side: const BorderSide(
+                                color: ZalonoTheme.primary, width: 1.8),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -859,7 +1005,8 @@ class OwnerProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDocRow(BuildContext context, String label, bool isAdded, {VoidCallback? onTap}) {
+  Widget _buildDocRow(BuildContext context, String label, bool isAdded,
+      {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -878,7 +1025,8 @@ class OwnerProfileScreen extends StatelessWidget {
             ),
             if (isAdded)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
@@ -902,7 +1050,8 @@ class OwnerProfileScreen extends StatelessWidget {
               )
             else
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEDE8E3),
                   borderRadius: BorderRadius.circular(14),
@@ -932,7 +1081,8 @@ class TimingsScreen extends StatefulWidget {
 }
 
 class _TimingsScreenState extends State<TimingsScreen> {
-  void _addNewTimingDialog(int dayIndex, String dayName, SalonAppState state) async {
+  void _addNewTimingDialog(
+      int dayIndex, String dayName, SalonAppState state) async {
     final start = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 10, minute: 0),
@@ -958,7 +1108,8 @@ class _TimingsScreenState extends State<TimingsScreen> {
     );
   }
 
-  void _editSlotDialog(int dayIndex, int slotIndex, TimeSlot slot, SalonAppState state) async {
+  void _editSlotDialog(
+      int dayIndex, int slotIndex, TimeSlot slot, SalonAppState state) async {
     final start = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 10, minute: 0),
@@ -988,34 +1139,7 @@ class _TimingsScreenState extends State<TimingsScreen> {
         child: Column(
           children: [
             // Top Spec Header: MORE | M4 · Timings
-            Container(
-              width: double.infinity,
-              color: const Color(0xFFEFE7E3),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'MORE',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF6B6864),
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  Text(
-                    'M4 · Timings',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF6B6864),
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            
 
             // Scrollable content with floating gradient bottom controls
             Expanded(
@@ -1037,7 +1161,8 @@ class _TimingsScreenState extends State<TimingsScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                                border: Border.all(
+                                    color: const Color(0xFFEFE8E1), width: 1.2),
                               ),
                               child: const Center(
                                 child: Icon(
@@ -1076,15 +1201,20 @@ class _TimingsScreenState extends State<TimingsScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                              border: Border.all(
+                                  color: const Color(0xFFEFE8E1), width: 1.2),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 18),
                             child: Column(
                               children: [
-                                for (int dayIdx = 0; dayIdx < state.salonTimings.length; dayIdx++) ...[
+                                for (int dayIdx = 0;
+                                    dayIdx < state.salonTimings.length;
+                                    dayIdx++) ...[
                                   if (dayIdx > 0)
                                     const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 12),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 12),
                                       child: Divider(
                                         height: 1,
                                         thickness: 1,
@@ -1136,7 +1266,8 @@ class _TimingsScreenState extends State<TimingsScreen> {
                                 state.copyMondayTimingsToAll();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text("Monday's timings copied to all days!"),
+                                    content: Text(
+                                        "Monday's timings copied to all days!"),
                                     backgroundColor: ZalonoTheme.primary,
                                   ),
                                 );
@@ -1159,7 +1290,8 @@ class _TimingsScreenState extends State<TimingsScreen> {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Timings saved successfully!'),
+                                      content:
+                                          Text('Timings saved successfully!'),
                                       backgroundColor: ZalonoTheme.primary,
                                     ),
                                   );
@@ -1231,13 +1363,16 @@ class _TimingsScreenState extends State<TimingsScreen> {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => _editSlotDialog(dayIdx, slotIdx, slot, state),
+                          onTap: () =>
+                              _editSlotDialog(dayIdx, slotIdx, slot, state),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 9),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                              border: Border.all(
+                                  color: const Color(0xFFEFE8E1), width: 1.2),
                             ),
                             child: Text(
                               '${slot.start} – ${slot.end}',
@@ -1294,7 +1429,9 @@ class SupportScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: ZalonoTheme.background,
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 20), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            onPressed: () => Navigator.pop(context)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -1302,28 +1439,42 @@ class SupportScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Support', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800)),
+              const Text('Support',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800)),
               const SizedBox(height: 20),
 
               // Executive Card
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ZalonoTheme.border)),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: ZalonoTheme.border)),
                 child: Row(
                   children: [
                     const CircleAvatar(
                       radius: 20,
                       backgroundColor: ZalonoTheme.primaryLight,
-                      child: Text('R', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
+                      child: Text('R',
+                          style: TextStyle(
+                              color: ZalonoTheme.primary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16)),
                     ),
                     const SizedBox(width: 14),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('YOUR ZALONO EXECUTIVE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+                          Text('YOUR ZALONO EXECUTIVE',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: ZalonoTheme.textSecondary)),
                           SizedBox(height: 2),
-                          Text('Rahul K.', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                          Text('Rahul K.',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w800)),
                         ],
                       ),
                     ),
@@ -1331,7 +1482,8 @@ class SupportScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(80, 38),
                         backgroundColor: ZalonoTheme.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(19)),
                       ),
                       onPressed: () => ActionDialogs.showCallSheet(
                         context,
@@ -1340,7 +1492,9 @@ class SupportScreen extends StatelessWidget {
                         subtitle: 'Dedicated Partner Manager',
                       ),
                       icon: const Icon(Icons.call, size: 16),
-                      label: const Text('Call', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      label: const Text('Call',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -1348,14 +1502,23 @@ class SupportScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Direct options
-              Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ZalonoTheme.border)),
+              Material(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: ZalonoTheme.border),
+                ),
+                clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.call_outlined, color: ZalonoTheme.primary),
-                      title: const Text('Call Zalono support', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      trailing: const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
+                      leading: const Icon(Icons.call_outlined,
+                          color: ZalonoTheme.primary),
+                      title: const Text('Call Zalono support',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 14)),
+                      trailing: const Icon(Icons.chevron_right,
+                          color: ZalonoTheme.textSecondary),
                       onTap: () => ActionDialogs.showCallSheet(
                         context,
                         name: 'Zalono Support Desk',
@@ -1363,15 +1526,26 @@ class SupportScreen extends StatelessWidget {
                         subtitle: 'Toll-free 24/7 Helpline',
                       ),
                     ),
-                    const Divider(height: 1, indent: 56, endIndent: 16, color: ZalonoTheme.border),
+                    const Divider(
+                        height: 1,
+                        indent: 56,
+                        endIndent: 16,
+                        color: ZalonoTheme.border),
                     ListTile(
-                      leading: const Icon(Icons.mail_outline, color: ZalonoTheme.primary),
-                      title: const Text('Email support', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      trailing: const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
+                      leading: const Icon(Icons.mail_outline,
+                          color: ZalonoTheme.primary),
+                      title: const Text('Email support',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 14)),
+                      trailing: const Icon(Icons.chevron_right,
+                          color: ZalonoTheme.textSecondary),
                       onTap: () {
-                        Clipboard.setData(const ClipboardData(text: 'support@zalono.com'));
+                        Clipboard.setData(
+                            const ClipboardData(text: 'support@zalono.com'));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Email support@zalono.com copied to clipboard!')),
+                          const SnackBar(
+                              content: Text(
+                                  'Email support@zalono.com copied to clipboard!')),
                         );
                       },
                     ),
@@ -1380,17 +1554,34 @@ class SupportScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              const Text('COMMON QUESTIONS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+              const Text('COMMON QUESTIONS',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: ZalonoTheme.textSecondary)),
               const SizedBox(height: 10),
 
-              Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ZalonoTheme.border)),
+              Material(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: ZalonoTheme.border),
+                ),
+                clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
                     _buildFaqItem(context, 'How do I check in a customer?'),
-                    const Divider(height: 1, indent: 56, endIndent: 16, color: ZalonoTheme.border),
+                    const Divider(
+                        height: 1,
+                        indent: 56,
+                        endIndent: 16,
+                        color: ZalonoTheme.border),
                     _buildFaqItem(context, 'A customer did not show up'),
-                    const Divider(height: 1, indent: 56, endIndent: 16, color: ZalonoTheme.border),
+                    const Divider(
+                        height: 1,
+                        indent: 56,
+                        endIndent: 16,
+                        color: ZalonoTheme.border),
                     _buildFaqItem(context, 'Change my salon details'),
                   ],
                 ),
@@ -1406,11 +1597,15 @@ class SupportScreen extends StatelessWidget {
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(6),
-        decoration: const BoxDecoration(color: ZalonoTheme.primaryLight, shape: BoxShape.circle),
-        child: const Icon(Icons.help_outline, color: ZalonoTheme.primary, size: 16),
+        decoration: const BoxDecoration(
+            color: ZalonoTheme.primaryLight, shape: BoxShape.circle),
+        child: const Icon(Icons.help_outline,
+            color: ZalonoTheme.primary, size: 16),
       ),
-      title: Text(question, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-      trailing: const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
+      title: Text(question,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+      trailing:
+          const Icon(Icons.chevron_right, color: ZalonoTheme.textSecondary),
       onTap: () => ActionDialogs.showFaqAnswer(context, question),
     );
   }
