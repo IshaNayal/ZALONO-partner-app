@@ -47,7 +47,7 @@ class BookingItem {
   final String id;
   final String customerName;
   final String customerPhone;
-  final String timeString; // e.g. "2:20 PM"
+  final String timeString; // e.g. "2:20 PM2:20 PM in chair"
   final DateTime dateTime;
   final List<ServiceItem> services;
   final String stylistName;

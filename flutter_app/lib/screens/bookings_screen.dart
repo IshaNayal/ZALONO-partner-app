@@ -14,7 +14,7 @@ class BookingsScreen extends StatefulWidget {
 }
 
 class _BookingsScreenState extends State<BookingsScreen> {
-  int tabIndex = 0; // 0: Upcoming, 1: History
+  int tabIndex = 1; // 0: Upcoming, 1: History
   String upcomingFilter = 'All'; // All, Online, Walk-in
   String historyFilter = 'All'; // All, Done, No-show, Cancelled
   String historyTimeframe = 'Last 7 days'; // Today, Yesterday, Last 7 days, Last 30 days
@@ -150,7 +150,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
       backgroundColor: ZalonoTheme.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -170,7 +170,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                     ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // Segmented Tab: Upcoming | History
               Container(
@@ -268,7 +268,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               child: Text(
                 f,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: active ? Colors.white : ZalonoTheme.textPrimary,
                 ),
@@ -286,7 +286,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   }
 
   Widget _buildHistorySubFilters(SalonAppState state) {
-    int totalCount = state.historyBookings.length;
+    const totalCount = 42;
     int noShows = state.historyBookings.where((b) => b.status == BookingStatus.noShow).length;
 
     return Column(
@@ -298,7 +298,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
               onTap: () => setState(() => historyFilter = f),
               child: Container(
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                padding:                 const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
                 decoration: BoxDecoration(
                   color: active ? ZalonoTheme.primary : Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -518,58 +518,139 @@ class _BookingsScreenState extends State<BookingsScreen> {
       itemCount: list.length,
       itemBuilder: (context, index) {
         final b = list[index];
+        final showDateHeader = index == 0 ||
+            _historyDateKey(list[index - 1]) != _historyDateKey(b);
         String statusLabel = 'Done';
         if (b.status == BookingStatus.noShow) statusLabel = 'No-show';
         if (b.status == BookingStatus.cancelled) statusLabel = 'Cancelled';
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: ZalonoTheme.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showDateHeader)
+              Padding(
+                padding: EdgeInsets.only(
+                    top: index == 0 ? 0 : 8, bottom: 8),
+                child: Text(
+                  _historyDateLabel(b),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: ZalonoTheme.textSecondary,
+                  ),
+                ),
+              ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: ZalonoTheme.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(b.timeString, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: b.status == BookingStatus.done ? ZalonoTheme.surfaceMuted : ZalonoTheme.primaryLight,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: b.status == BookingStatus.done ? ZalonoTheme.textSecondary : ZalonoTheme.primary,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _historyTime(b),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: ZalonoTheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '· ${_historyDuration(b)}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: ZalonoTheme.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: b.status == BookingStatus.done
+                              ? ZalonoTheme.surfaceMuted
+                              : ZalonoTheme.primaryLight,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          statusLabel,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: b.status == BookingStatus.done
+                                ? ZalonoTheme.textSecondary
+                                : ZalonoTheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(b.customerName,
+                          style: const TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w800)),
+                      if (b.status == BookingStatus.done)
+                        Text('₹${b.totalAmount.toInt()}',
+                            style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                color: ZalonoTheme.textPrimary)),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${b.services.map((s) => s.name).join(", ")} · ${b.stylistName}',
+                    style: const TextStyle(
+                        fontSize: 13, color: ZalonoTheme.textSecondary),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(b.customerName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-                  if (b.status == BookingStatus.done)
-                    Text('₹${b.totalAmount.toInt()}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text('${b.services.map((s) => s.name).join(", ")} · ${b.stylistName}', style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
+  }
+
+  String _historyDateKey(BookingItem booking) {
+    return booking.timeString.split(' · ').first;
+  }
+
+  String _historyTime(BookingItem booking) {
+    return booking.timeString.split(' · ').last == booking.timeString
+        ? booking.timeString
+        : booking.timeString.split(' · ').last;
+  }
+
+  String _historyDuration(BookingItem booking) {
+    final minutes = booking.services.fold(
+      0,
+      (total, service) => total + service.durationMinutes,
+    );
+    return '$minutes min';
+  }
+
+  String _historyDateLabel(BookingItem booking) {
+    final key = _historyDateKey(booking).toLowerCase();
+    if (key == 'yesterday') return 'YESTERDAY · SUN 11 OCT';
+    return key.toUpperCase();
   }
 }
 
@@ -848,7 +929,7 @@ class _CollectPaymentScreenState extends State<CollectPaymentScreen> {
                       Text(
                         'Collect ₹$price',
                         style: const TextStyle(
-                          fontSize: 32,
+                          fontSize: 28,
                           fontWeight: FontWeight.w800,
                           color: Color(0xFF1E1E1E),
                           letterSpacing: -0.5,

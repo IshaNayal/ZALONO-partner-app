@@ -33,6 +33,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   late TextEditingController _emailController;
   late TextEditingController _gstController;
   bool emailVerified = false;
+  bool _editingOwnerInReview = false;
 
   bool panAdded = true;
   bool aadhaarAdded = false;
@@ -57,12 +58,19 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   // Step 6: Services
   String selectedServiceCategory = 'Hair';
+  final List<String> serviceCategories = ['Hair', 'Skin', 'Nails', 'Body'];
   final List<Map<String, dynamic>> services = [
-    {'name': 'Haircut (Men)', 'time': '30 min', 'price': '₹399', 'checked': true},
-    {'name': 'Haircut (Women)', 'time': '45 min', 'price': '₹699', 'checked': true},
-    {'name': 'Beard trim', 'time': '15 min', 'price': '₹149', 'checked': true},
-    {'name': 'Hair colour', 'time': '90 min', 'price': '₹2,499', 'checked': true},
-    {'name': 'Hair spa', 'time': '60 min', 'price': '₹1,999', 'checked': false},
+    {'category': 'Hair', 'name': 'Haircut (Men)', 'time': '30 min', 'price': '₹399', 'checked': true},
+    {'category': 'Hair', 'name': 'Haircut (Women)', 'time': '45 min', 'price': '₹699', 'checked': true},
+    {'category': 'Hair', 'name': 'Beard trim', 'time': '15 min', 'price': '₹149', 'checked': true},
+    {'category': 'Hair', 'name': 'Hair colour', 'time': '90 min', 'price': '₹2,499', 'checked': true},
+    {'category': 'Hair', 'name': 'Hair spa', 'time': '60 min', 'price': '₹1,999', 'checked': false},
+    {'category': 'Skin', 'name': 'Classic facial', 'time': '45 min', 'price': '₹899', 'checked': false},
+    {'category': 'Skin', 'name': 'Clean-up', 'time': '30 min', 'price': '₹499', 'checked': false},
+    {'category': 'Nails', 'name': 'Manicure', 'time': '30 min', 'price': '₹399', 'checked': false},
+    {'category': 'Nails', 'name': 'Pedicure', 'time': '45 min', 'price': '₹599', 'checked': false},
+    {'category': 'Body', 'name': 'Body massage', 'time': '60 min', 'price': '₹1,499', 'checked': false},
+    {'category': 'Body', 'name': 'Body scrub', 'time': '45 min', 'price': '₹999', 'checked': false},
   ];
 
   // Step 7: Stylists
@@ -82,6 +90,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     'Wed': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
     'Thu': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
     'Fri': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
+    'Sat': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
+    'Sun': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
   };
 
   // Step 9: Agreement
@@ -108,9 +118,23 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     _addressController = TextEditingController(text: state.address.isNotEmpty ? state.address : 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar');
     _pincodeController = TextEditingController(text: '751007');
 
+    for (final controller in [
+      _phoneController,
+      _onboardingCodeController,
+      _ownerNameController,
+      _emailController,
+      _salonNameController,
+      _customCategoryController,
+      _addressController,
+      _pincodeController,
+    ]) {
+      controller.addListener(_onFormChanged);
+    }
+
     if (state.salonPhotos.isNotEmpty) {
       salonPhotoBytes = List.from(state.salonPhotos);
     }
+
     if (state.panCardBytes != null) {
       panBytes = state.panCardBytes;
       panFileName = state.panCardFileName;
@@ -125,6 +149,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       businessProofBytes = state.businessProofBytes;
       businessProofFileName = state.businessProofFileName;
       businessProofAdded = true;
+    }
+  }
+
+  void _onFormChanged() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -176,11 +206,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add Service in Hair', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: Text('Add Service in $selectedServiceCategory', style: const TextStyle(fontWeight: FontWeight.w800)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Service Name', hintText: 'e.g. Hair Wash & Blow dry')),
+            TextField(
+              controller: nameCtrl,
+              decoration: InputDecoration(
+                labelText: 'Service Name',
+                hintText: 'e.g. ${_serviceHintForCategory(selectedServiceCategory)}',
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Price', prefixText: '₹')),
             const SizedBox(height: 10),
@@ -194,6 +230,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               if (nameCtrl.text.trim().isNotEmpty) {
                 setState(() {
                   services.add({
+                    'category': selectedServiceCategory,
                     'name': nameCtrl.text.trim(),
                     'time': timeCtrl.text.trim().isEmpty ? '30 min' : timeCtrl.text.trim(),
                     'price': '₹${priceCtrl.text.trim()}',
@@ -205,12 +242,66 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                   SnackBar(content: Text('Added ${nameCtrl.text.trim()} to services!'), backgroundColor: ZalonoTheme.primary),
                 );
               }
+
             },
             child: const Text('Add Service'),
           ),
         ],
       ),
     );
+  }
+
+  void _addServiceDomainDialog() {
+    final domainCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add service domain', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: TextField(
+          controller: domainCtrl,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            labelText: 'Domain name',
+            hintText: 'e.g. Makeup',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final domain = domainCtrl.text.trim();
+              if (domain.isEmpty ||
+                  serviceCategories.any((category) => category.toLowerCase() == domain.toLowerCase())) {
+                return;
+              }
+              setState(() {
+                serviceCategories.add(domain);
+                selectedServiceCategory = domain;
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Add domain'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _serviceHintForCategory(String category) {
+    switch (category) {
+      case 'Skin':
+        return 'Deep cleansing facial';
+      case 'Nails':
+        return 'Gel extensions';
+      case 'Body':
+        return 'Aromatherapy massage';
+      default:
+        return 'Hair wash & blow dry';
+    }
   }
 
   void _addNewStylistDialog() {
@@ -259,6 +350,37 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     );
   }
 
+  Future<void> _confirmDeleteStylist(Map<String, String> stylist) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete stylist?'),
+        content: Text('Remove ${stylist['name']} from your salon team?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true && mounted) {
+      setState(() => stylists.remove(stylist));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${stylist['name']} removed from salon stylists.'),
+          backgroundColor: ZalonoTheme.primary,
+        ),
+      );
+    }
+  }
+
   void _addNewTimingSlot(String day) async {
     final start = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 10, minute: 0));
     if (!mounted || start == null) return;
@@ -281,8 +403,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     final monSlots = dayTimings['Mon'];
     if (monSlots != null) {
       setState(() {
-        for (var day in ['Tue', 'Wed', 'Thu', 'Fri']) {
-          dayTimings[day] = monSlots.map((s) => Map<String, dynamic>.from(s)).toList();
+        for (final day in dayTimings.keys) {
+          if (day != 'Mon') {
+            dayTimings[day] = monSlots
+                .map((slot) => Map<String, dynamic>.from(slot))
+                .toList();
+          }
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -370,7 +496,52 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
   }
 
+  bool get _hasRequiredDocuments =>
+      panBytes != null &&
+      panBytes!.isNotEmpty &&
+      aadhaarBytes != null &&
+      aadhaarBytes!.isNotEmpty &&
+      businessProofBytes != null &&
+      businessProofBytes!.isNotEmpty;
+
+  bool get _isCurrentStepComplete {
+    switch (_currentStep) {
+      case 1:
+        return _isNumberVerified;
+      case 2:
+        return codeVerified && _onboardingCodeController.text.trim().isNotEmpty;
+      case 3:
+        return _ownerNameController.text.trim().isNotEmpty &&
+            _emailController.text.trim().isNotEmpty &&
+            _hasRequiredDocuments;
+      case 4:
+        return salonPhotoBytes.where((photo) => photo.isNotEmpty).length >= 3 &&
+            _salonNameController.text.trim().isNotEmpty &&
+            salonServes.isNotEmpty &&
+            _customCategoryController.text.trim().isNotEmpty;
+      case 5:
+        return _addressController.text.trim().isNotEmpty &&
+            _pincodeController.text.trim().length == 6;
+      case 6:
+        return services.any((service) => service['checked'] == true);
+      case 7:
+        return true;
+      case 8:
+        return dayTimings.values.any(
+          (slots) => slots.any((slot) => slot['on'] == true),
+        );
+      case 9:
+        return agreeTerms;
+      default:
+        return false;
+    }
+  }
+
   void _nextStep() {
+    if (!_isCurrentStepComplete) {
+      return;
+    }
+
     if (_currentStep == 1 && !_isNumberVerified) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -434,8 +605,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       return _buildR12Submitted();
     }
 
-    final isContinueDisabled = (_currentStep == 1 && !_isNumberVerified) ||
-        (_currentStep == 9 && !agreeTerms);
+    final isContinueDisabled = !_isCurrentStepComplete;
 
     return Scaffold(
       backgroundColor: ZalonoTheme.background,
@@ -489,6 +659,11 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: isContinueDisabled ? null : _nextStep,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isContinueDisabled
+                      ? const Color(0xFFD0CBC6)
+                      : ZalonoTheme.primary,
+                ),
                 child: Text(_currentStep == 9 ? 'Submit for review' : 'Continue'),
               ),
               if (_currentStep == 7) ...[
@@ -540,9 +715,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Verify your mobile number',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ZalonoTheme.textPrimary, height: 1.2),
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+            height: 1.2,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -647,26 +830,29 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         ] else ...[
           Padding(
             padding: const EdgeInsets.only(top: 6.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Enter dummy code 123456 by hand',
-                  style: TextStyle(color: ZalonoTheme.textSecondary, fontSize: 13),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    for (int i = 0; i < 6; i++) {
-                      _otpControllers[i].text = '${i + 1}';
-                    }
-                    _checkOtpVerification();
-                  },
-                  child: const Text(
-                    'Auto-fill 123456',
-                    style: TextStyle(color: ZalonoTheme.primary, fontSize: 12, fontWeight: FontWeight.w700),
+            child: SizedBox(
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Enter dummy code 123456 by hand',
+                    style: TextStyle(color: ZalonoTheme.textSecondary, fontSize: 13),
                   ),
-                ),
-              ],
+                  GestureDetector(
+                    onTap: () {
+                      for (int i = 0; i < 6; i++) {
+                        _otpControllers[i].text = '${i + 1}';
+                      }
+                      _checkOtpVerification();
+                    },
+                    child: const Text(
+                      'Auto-fill 123456',
+                      style: TextStyle(color: ZalonoTheme.primary, fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -679,9 +865,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Enter your onboarding code',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: ZalonoTheme.textPrimary, height: 1.2),
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+            height: 1.2,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -735,13 +929,23 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       ],
     );
   }
-
+//
   // R4 · About the owner (Step 3 of 9)
   Widget _buildR4AboutOwner() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('About the owner', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'About the owner',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 24),
         const Text('FULL NAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
@@ -886,14 +1090,33 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Verify your email',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary, height: 1.2),
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+            height: 1.2,
+          ),
         ),
         const SizedBox(height: 8),
-        Text(
-          'We sent a 6-digit code to ${_emailController.text}.',
-          style: const TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
+        Text.rich(
+          TextSpan(
+            style: const TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
+            children: [
+              const TextSpan(text: 'We sent a 6-digit code to '),
+              TextSpan(
+                text: '${_emailController.text}.',
+                style: const TextStyle(
+                  color: ZalonoTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 24),
         const Text('ENTER THE 6-DIGIT CODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
@@ -980,10 +1203,13 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E1E1E),
+                      fontWeight: FontWeight.w900,
+                      foreground: Paint()
+                        ..style = PaintingStyle.fill
+                        ..strokeWidth = 1.2
+                        ..color = const Color(0xFF1E1E1E),
                     ),
                   ),
                   if (subtitle != null) ...[
@@ -1184,7 +1410,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Tell us about the salon', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'Tell us about the salon',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 20),
         const Text('SALON PHOTOS · 3 TO 5', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
@@ -1375,7 +1611,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Where is the salon?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'Where is the salon?',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Stand at the salon so the pin is exact. Customers see walking time from this spot.',
@@ -1443,71 +1689,133 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   // R8 · Services (Step 6 of 9)
   Widget _buildR8Services() {
+    final categories = List<String>.of(serviceCategories)..add('+ Add');
+    final selectedServices = services
+        .where((service) => service['category'] == selectedServiceCategory)
+        .toList();
+    final selectedServiceCount = services
+        .where((service) => service['category'] == selectedServiceCategory)
+        .where((service) => service['checked'] == true)
+        .length;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('What do you offer?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'What do you offer?',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text('Tick what you offer. Tap a time or price to change it.', style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 20),
-        Row(
-          children: ['Hair', 'Skin', 'Nails', 'Body', '+ Add'].map((cat) {
-            final active = cat == selectedServiceCategory;
-            return GestureDetector(
-              onTap: () {
-                if (cat == '+ Add') {
-                  _addNewServiceDialog();
-                } else {
-                  setState(() => selectedServiceCategory = cat);
-                }
-              },
-              child: Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: active ? ZalonoTheme.primary : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
-                ),
-                child: Text(
-                  cat,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: active ? Colors.white : (cat == '+ Add' ? ZalonoTheme.primary : ZalonoTheme.textPrimary),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: categories.map<Widget>((cat) {
+              final active = cat == selectedServiceCategory;
+              return GestureDetector(
+                onTap: () {
+                  if (cat == '+ Add') {
+                    _addServiceDomainDialog();
+                  } else {
+                    setState(() => selectedServiceCategory = cat);
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: active ? ZalonoTheme.primary : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                  ),
+                  child: Text(
+                    cat,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: active ? Colors.white : (cat == '+ Add' ? ZalonoTheme.primary : ZalonoTheme.textPrimary),
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
         const SizedBox(height: 16),
-        ...services.map((s) => Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
-          child: Row(
-            children: [
-              Checkbox(
-                value: s['checked'],
-                activeColor: ZalonoTheme.primary,
-                onChanged: (val) => setState(() => s['checked'] = val ?? false),
-              ),
-              Expanded(child: Text(s['name'], style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14))),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: ZalonoTheme.surfaceMuted, borderRadius: BorderRadius.circular(8)),
-                child: Text(s['time'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: ZalonoTheme.surfaceMuted, borderRadius: BorderRadius.circular(8)),
-                child: Text(s['price'], style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-              ),
-            ],
+        if (selectedServices.isNotEmpty)
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: ZalonoTheme.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Column(
+              children: List.generate(selectedServices.length, (index) {
+                final service = selectedServices[index];
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: service['checked'],
+                            activeColor: ZalonoTheme.primary,
+                            onChanged: (value) => setState(() {
+                              service['checked'] = value ?? false;
+                            }),
+                          ),
+                          Expanded(
+                            child: Text(
+                              service['name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: ZalonoTheme.surfaceMuted,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              service['time'],
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: ZalonoTheme.surfaceMuted,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              service['price'],
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (index < selectedServices.length - 1)
+                      const Divider(height: 1, color: ZalonoTheme.border),
+                  ],
+                );
+              }),
+            ),
           ),
-        )),
         const SizedBox(height: 10),
         GestureDetector(
           onTap: _addNewServiceDialog,
@@ -1518,14 +1826,23 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               border: Border.all(color: ZalonoTheme.primary, style: BorderStyle.solid),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Center(
-              child: Text('+ Add service in Hair', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+            child: Center(
+              child: Text(
+                '+ Add service in $selectedServiceCategory',
+                style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700),
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
         Center(
-          child: Text('${services.where((s) => s['checked'] == true).length} services selected', style: const TextStyle(color: ZalonoTheme.textSecondary, fontWeight: FontWeight.w600)),
+          child: Text(
+            '$selectedServiceCount ${selectedServiceCount == 1 ? 'service' : 'services'} selected',
+            style: const TextStyle(
+              color: ZalonoTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
@@ -1538,7 +1855,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       children: [
         Row(
           children: [
-            const Text('Who works here?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+            Text(
+              'Who works here?',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                foreground: Paint()
+                  ..style = PaintingStyle.fill
+                  ..strokeWidth = 1.2
+                  ..color = ZalonoTheme.textPrimary,
+              ),
+            ),
             const SizedBox(width: 10),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1568,32 +1895,35 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ...stylists.map((st) => Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                backgroundColor: ZalonoTheme.primaryLight,
-                radius: 20,
-                child: Text(st['initial']!, style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(st['name']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 2),
-                    Text(st['role']!, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
-                    const SizedBox(height: 4),
-                    Text(st['services']!, style: const TextStyle(fontSize: 12, color: ZalonoTheme.primary, fontWeight: FontWeight.w600)),
-                  ],
+        ...stylists.map((st) => GestureDetector(
+          onLongPress: () => _confirmDeleteStylist(st),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundColor: ZalonoTheme.primaryLight,
+                  radius: 20,
+                  child: Text(st['initial']!, style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
                 ),
-              ),
-            ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(st['name']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 2),
+                      Text(st['role']!, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
+                      const SizedBox(height: 4),
+                      Text(st['services']!, style: const TextStyle(fontSize: 12, color: ZalonoTheme.primary, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         )),
         const SizedBox(height: 16),
@@ -1615,7 +1945,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('When are you open?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'When are you open?',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Add more than one timing a day if you take a break. Use the toggle to switch a timing on or off.',
@@ -1738,14 +2078,36 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Review and agree', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary)),
+        Text(
+          'Review and agree',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            foreground: Paint()
+              ..style = PaintingStyle.fill
+              ..strokeWidth = 1.2
+              ..color = ZalonoTheme.textPrimary,
+          ),
+        ),
         const SizedBox(height: 20),
-        _buildReviewRow('Owner', '${_ownerNameController.text} · +91 ${_phoneController.text}', 3),
-        _buildReviewRow('Salon', '${_salonNameController.text} · $salonCategory', 4),
-        _buildReviewRow('Location', '${_addressController.text.split(',').first} · ${_pincodeController.text}', 5),
-        _buildReviewRow('Services', '${services.where((s) => s['checked'] == true).length} services', 6),
-        _buildReviewRow('Stylists', '${stylists.length} people', 7),
-        _buildReviewRow('Timings', 'Open 7 days · Mon break 2–4 PM', 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ZalonoTheme.border),
+          ),
+          child: Column(
+            children: [
+              _buildOwnerReviewRow(),
+              _buildReviewRow('Salon', '${_salonNameController.text} · $salonCategory', 4),
+              _buildReviewRow('Location', '${_addressController.text.split(',').first} · ${_pincodeController.text}', 5),
+              _buildReviewRow('Services', '${services.where((s) => s['checked'] == true).length} services', 6),
+              _buildReviewRow('Stylists', '${stylists.length} people', 7),
+              _buildReviewRow('Timings', 'Open 7 days · Mon break 2–4 PM', 8),
+            ],
+          ),
+        ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -1777,7 +2139,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     );
   }
 
-  Widget _buildReviewRow(String label, String value, int stepTarget) {
+  Widget _buildReviewRow(
+    String label,
+    String value,
+    int stepTarget, {
+    VoidCallback? onEdit,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: const BoxDecoration(
@@ -1795,12 +2162,90 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             ],
           ),
           TextButton(
-            onPressed: () => setState(() => _currentStep = stepTarget),
+            onPressed: onEdit ?? () => _editReviewSection(stepTarget),
             child: const Text('Edit', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildOwnerReviewRow() {
+    if (!_editingOwnerInReview) {
+      return _buildReviewRow(
+        'Owner',
+        '${_ownerNameController.text} · +91 ${_phoneController.text}',
+        3,
+        onEdit: () => setState(() => _editingOwnerInReview = true),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: ZalonoTheme.border)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Owner',
+            style: TextStyle(
+              fontSize: 12,
+              color: ZalonoTheme.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _ownerNameController,
+            decoration: const InputDecoration(
+              labelText: 'Full name',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'Mobile number',
+              prefixText: '+91 ',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => setState(() => _editingOwnerInReview = false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (_ownerNameController.text.trim().isEmpty ||
+                      _phoneController.text.trim().isEmpty) {
+                    return;
+                  }
+                  setState(() => _editingOwnerInReview = false);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editReviewSection(int stepTarget) {
+    setState(() {
+      _isVerifyingEmail = false;
+      _currentStep = stepTarget;
+    });
   }
 
   // R12 · Submitted

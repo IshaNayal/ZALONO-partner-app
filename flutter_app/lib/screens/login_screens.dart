@@ -55,12 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _simulateApproval() {
-    setState(() {
-      showNotificationSim = true;
-    });
-  }
-
   void _resendCode() {
     setState(() {
       resendCountdown = 30;
@@ -100,6 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacementNamed(context, '/main');
     }
   }
+
+  bool get _isOtpComplete =>
+      _otpControllers.every((controller) => controller.text.isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +152,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 24),
 
               const Text(
-                'Log in',
+                'Log In',
                 style: TextStyle(
                   fontSize: 32,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w900,
                   color: ZalonoTheme.textPrimary,
                 ),
               ),
@@ -292,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
               // A2: Blocked Card
-              if (isBlocked) ...[
+              if (_isOtpComplete || isBlocked) ...[
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -344,27 +341,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const Spacer(),
 
-              // Quick Pilot Simulation trigger
-              if (isBlocked)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: Center(
-                    child: TextButton.icon(
-                      icon: const Icon(Icons.notifications_active, color: ZalonoTheme.primary),
-                      label: const Text('Simulate Approval Push Notification', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.bold)),
-                      onPressed: _simulateApproval,
-                    ),
-                  ),
-                ),
-
               ElevatedButton(
-                onPressed: _handleLogin,
-                child: Text(isBlocked ? 'Log in (Approved)' : 'Log in'),
+                onPressed: _isOtpComplete ? _handleLogin : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isOtpComplete
+                      ? ZalonoTheme.primary
+                      : const Color(0xFFD0CBC6),
+                ),
+                child: Text(isBlocked ? 'Log in (Approved)' : 'Log in', style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 12),
 
               Center(
-                child: isBlocked
+                child: (_isOtpComplete || isBlocked)
                     ? TextButton(
                         onPressed: () => ActionDialogs.showSupportSheet(context),
                         child: const Text('Contact support', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),

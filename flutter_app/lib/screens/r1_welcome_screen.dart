@@ -60,9 +60,9 @@ class WelcomeScreen extends StatelessWidget {
                 'Run your day\nfrom your phone.',
                 style: TextStyle(
                   fontSize: 34,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.bold,
                   height: 1.15,
-                  color: ZalonoTheme.textPrimary,
+                  color: Color.fromARGB(255, 0, 0, 0),
                 ),
               ),
               const SizedBox(height: 12),

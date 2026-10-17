@@ -103,22 +103,13 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: ZalonoTheme.primaryLight,
-                        borderRadius: BorderRadius.circular(14),
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: ZalonoTheme.primaryLight,
+                      child: Text(
+                        appState.salonName.isNotEmpty ? appState.salonName[0] : 'S',
+                        style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 20),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: appState.salonPhotos.isNotEmpty
-                          ? Image.memory(appState.salonPhotos.first, fit: BoxFit.cover)
-                          : Center(
-                              child: Text(
-                                appState.salonName.isNotEmpty ? appState.salonName[0] : 'S',
-                                style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 20),
-                              ),
-                            ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -298,24 +289,20 @@ class SalonProfileScreen extends StatelessWidget {
                             const Color(0xFFE2A69D),
                             const Color(0xFFF4DDD6),
                           ];
-                          final hasExtra = index == 2 && state.salonPhotos.length > 3;
-                          final extraCount = state.salonPhotos.length - 3;
                           return Expanded(
                             child: GestureDetector(
                               onTap: () async {
                                 final picked = await FileUploadHelper.pickImageFile();
-                                if (picked != null && context.mounted) {
-                                  if (index < state.salonPhotos.length) {
-                                    context.read<SalonAppState>().updateSalonPhoto(index, picked.bytes);
-                                  } else {
+                                if (picked != null) {
+                                  if (context.mounted) {
                                     context.read<SalonAppState>().addSalonPhoto(picked.bytes);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Salon photo added: ${picked.name}'),
+                                        backgroundColor: ZalonoTheme.primary,
+                                      ),
+                                    );
                                   }
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Salon photo updated: ${picked.name}'),
-                                      backgroundColor: ZalonoTheme.primary,
-                                    ),
-                                  );
                                 }
                               },
                               child: Container(
@@ -327,42 +314,11 @@ class SalonProfileScreen extends StatelessWidget {
                                   border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
                                 ),
                                 clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    if (photo != null && photo.isNotEmpty)
-                                      Image.memory(
-                                        photo,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                      )
-                                    else
-                                      const Center(
+                                child: photo != null
+                                    ? Image.memory(photo, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                                    : const Center(
                                         child: Icon(Icons.add_photo_alternate_outlined, size: 22, color: Color(0xFF8A5A53)),
                                       ),
-                                    if (hasExtra)
-                                      Positioned(
-                                        bottom: 6,
-                                        right: 6,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xA6000000),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            '+$extraCount',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
                               ),
                             ),
                           );
@@ -572,7 +528,7 @@ class OwnerProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFDE8EC),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFF0BDC6)),
+                    border: Border.all(color: ZalonoTheme.primary.withValues()),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
