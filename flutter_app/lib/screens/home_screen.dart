@@ -418,14 +418,14 @@ class _AddWalkInSheet extends StatefulWidget {
 class _AddWalkInSheetState extends State<_AddWalkInSheet> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
-  final List<String> _selectedServices = ['Haircut (Men)', 'Beard trim'];
-  String _selectedStylist = 'Priya';
+  final List<String> _selectedServices = [];
+  String? _selectedStylist;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: 'Mohit S.');
-    _phoneController = TextEditingController(text: '98765 12345');
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
   }
 
   @override
@@ -602,7 +602,7 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
 
             Row(
               children: appState.stylists.where((s) => s.isAvailable).map((st) {
-                final isSelected = _selectedStylist
+                final isSelected = (_selectedStylist ?? '')
                     .toLowerCase()
                     .contains(st.name.split(' ').first.toLowerCase());
                 return Expanded(
@@ -698,10 +698,15 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
 
             ElevatedButton(
               onPressed: () {
-                final customerName = _nameController.text.trim().isEmpty
-                    ? 'Walk-in Customer'
-                    : _nameController.text.trim();
+                final customerName = _nameController.text.trim();
                 final phone = _phoneController.text.trim();
+                if (customerName.isEmpty || phone.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Enter the customer name and phone number.')),
+                  );
+                  return;
+                }
                 if (_selectedServices.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -709,13 +714,19 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
                   );
                   return;
                 }
+                if (_selectedStylist == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please select an available stylist.')),
+                  );
+                  return;
+                }
 
                 appState.addWalkIn(
                   customerName: customerName,
-                  customerPhone:
-                      phone.isNotEmpty ? '+91 $phone' : '+91 98765 12345',
+                  customerPhone: '+91 $phone',
                   serviceNames: _selectedServices,
-                  stylistName: _selectedStylist,
+                  stylistName: _selectedStylist!,
                   totalAmount: totalPrice,
                 );
 

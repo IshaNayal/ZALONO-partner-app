@@ -47,6 +47,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('STEP 2 OF 9'), findsOneWidget);
 
+    await tester.enterText(find.byType(TextField).first, 'ZL-4821');
+    await tester.pumpAndSettle();
+
     // Continue to step 3
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
@@ -54,6 +57,7 @@ void main() {
 
     // Enter owner name
     await tester.enterText(find.byType(TextField).first, 'Rohan Mehta');
+    await tester.enterText(find.byType(TextField).at(1), 'rohan.mehta@example.com');
     await tester.pumpAndSettle();
 
     // Tap Continue on Step 3 to go to 'Verify your email'
@@ -154,28 +158,28 @@ void main() {
     expect(find.text('Deepak Kumar'), findsOneWidget);
     expect(find.text('Deepak'), findsOneWidget);
 
-    // Long press on Priya Sharma to trigger confirmation dialog
-    await tester.longPress(find.text('Priya Sharma'));
+    // Long press on Deepak Kumar to trigger confirmation dialog
+    await tester.longPress(find.text('Deepak Kumar'));
     await tester.pumpAndSettle();
 
     // Confirm dialog is shown
-    expect(find.text('Delete Priya Sharma?'), findsOneWidget);
+    expect(find.text('Delete Deepak Kumar?'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Delete'), findsOneWidget);
 
     // Tap Cancel
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
-    expect(find.text('Priya Sharma'), findsOneWidget);
+    expect(find.text('Deepak Kumar'), findsOneWidget);
 
     // Long press again and confirm deletion
-    await tester.longPress(find.text('Priya Sharma'));
+    await tester.longPress(find.text('Deepak Kumar'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
     await tester.pumpAndSettle();
 
     // Verify Priya Sharma has been removed
-    expect(find.text('Priya Sharma'), findsNothing);
+    expect(find.text('Deepak Kumar'), findsNothing);
   });
 
   testWidgets('Test TimingsScreen', (tester) async {

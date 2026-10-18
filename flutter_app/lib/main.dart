@@ -13,9 +13,11 @@ import 'screens/more_screens.dart';
 
 import 'package:provider/provider.dart';
 import 'services/app_state.dart';
+import 'services/firebase_service.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseService.initialize();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

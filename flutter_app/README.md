@@ -60,12 +60,25 @@ cd flutter_app
 # 2. Get dependencies
 flutter pub get
 
-# 3. Run on an iOS Simulator or connected iPhone
+# 3. Configure Firebase (requires Firebase CLI login)
+dart pub global activate flutterfire_cli
+flutterfire configure --project=zalono-partner
+
+# 4. Run on an iOS Simulator or connected iPhone
 flutter run -d ios
 
-# 4. Run on an Android Emulator or connected device
+# 5. Run on an Android Emulator or connected device
 flutter run -d android
 ```
+
+Firebase configuration generates `lib/firebase_options.dart`. The app can
+still open for local UI development before configuration, but Firebase
+authentication remains unavailable until this command is completed.
+
+The registration upload uses Firebase Anonymous Authentication to obtain a
+verified ID token for the backend. Enable the **Anonymous** provider in
+Firebase Console under Authentication > Sign-in method before submitting a
+registration.
 
 ### Building for Production
 

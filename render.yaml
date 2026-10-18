@@ -13,3 +13,19 @@ services:
       flutter pub get
       flutter build web --release
     staticPublishPath: build/web
+  - type: web
+    name: zalono-partner-backend
+    runtime: node
+    branch: main
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://zalono-partner-app.onrender.com

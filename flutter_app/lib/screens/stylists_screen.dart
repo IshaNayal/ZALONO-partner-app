@@ -189,10 +189,10 @@ class _StylistsScreenState extends State<StylistsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Stylist',
+                'Stylists',
                 style: TextStyle(
                     fontSize: 32,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                     letterSpacing: -0.6,
                     color: ZalonoTheme.textPrimary),
               ),

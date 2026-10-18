@@ -6,15 +6,15 @@ import '../utils/app_storage.dart';
 
 class SalonAppState extends ChangeNotifier {
   // Salon Information
-  String salonName = 'Glow Studio';
-  String salonCategory = 'Premium';
-  String salonServes = 'Unisex, Kids salon';
-  String address = 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar 751007';
+  String salonName = '';
+  String salonCategory = '';
+  String salonServes = '';
+  String address = '';
   String ownerName = '';
-  String ownerPhone = '+91 98765 43210';
-  String ownerEmail = 'rohan@glowstudio.in';
-  String gstNumber = '22ABCDE1234F1Z5';
-  bool panCardAdded = true;
+  String ownerPhone = '';
+  String ownerEmail = '';
+  String gstNumber = '';
+  bool panCardAdded = false;
   bool aadhaarAdded = false;
   bool businessProofAdded = false;
   Uint8List? panCardBytes;
@@ -24,9 +24,12 @@ class SalonAppState extends ChangeNotifier {
   Uint8List? businessProofBytes;
   String? businessProofFileName;
   List<Uint8List> salonPhotos = [];
-  int salonServicesCount = 4;
+  int salonServicesCount = 0;
 
   SalonAppState() {
+    bookings.clear();
+    notifications.clear();
+    baseRevenue = 0;
     _loadPersistedState();
   }
 
@@ -198,32 +201,7 @@ class SalonAppState extends ChangeNotifier {
   String selectedHomeFilter = 'Today'; // Today, This week, This month, Custom
 
   // Stylists
-  List<StylistItem> stylists = [
-    StylistItem(
-      id: 'stylist_1',
-      name: 'Priya Sharma',
-      role: 'Hair specialist',
-      services: ['Haircut (Men)', 'Haircut (Women)', 'Beard trim', 'Hair colour'],
-      isAvailable: true,
-      statusDetail: 'Available · 4 bookings today',
-    ),
-    StylistItem(
-      id: 'stylist_2',
-      name: 'Rahul Das',
-      role: 'Skin specialist',
-      services: ['Facial', 'Clean-up'],
-      isAvailable: false,
-      statusDetail: 'Off until 5:00 PM',
-    ),
-    StylistItem(
-      id: 'stylist_3',
-      name: 'Neha Patel',
-      role: 'Nail artist',
-      services: ['Manicure', 'Pedicure'],
-      isAvailable: true,
-      statusDetail: 'With a walk-in till 3:20 PM',
-    ),
-  ];
+  List<StylistItem> stylists = [];
 
   // Bookings
   List<BookingItem> bookings = [
@@ -247,7 +225,7 @@ class SalonAppState extends ChangeNotifier {
     BookingItem(
       id: 'ZAL-6849',
       customerName: 'Aarav K.',
-      customerPhone: '+91 98765 43210',
+      customerPhone: '',
       timeString: '2:20 PM',
       dateTime: DateTime.now().add(const Duration(minutes: 30)),
       services: [
@@ -641,7 +619,7 @@ class SalonAppState extends ChangeNotifier {
     final newBooking = BookingItem(
       id: 'WLK-${DateTime.now().millisecondsSinceEpoch % 10000}',
       customerName: customerName,
-      customerPhone: customerPhone.isNotEmpty ? customerPhone : '+91 99999 00000',
+      customerPhone: customerPhone,
       timeString: 'Walk-in · in chair',
       dateTime: DateTime.now(),
       services: selectedServicesList,

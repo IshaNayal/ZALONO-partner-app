@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
 import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
 import '../widgets/zalono_switch.dart';
+import '../services/onboarding_api.dart';
 
 class RegistrationFlowScreen extends StatefulWidget {
   const RegistrationFlowScreen({super.key});
@@ -28,7 +30,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   // Step 2: Onboarding Code
   late TextEditingController _onboardingCodeController;
-  bool codeVerified = true;
+  bool codeVerified = false;
 
   // Step 3: Owner & Email
   late TextEditingController _ownerNameController;
@@ -37,7 +39,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   bool emailVerified = false;
   bool _editingOwnerInReview = false;
 
-  bool panAdded = true;
+  bool panAdded = false;
   bool aadhaarAdded = false;
   bool businessProofAdded = false;
   Uint8List? panBytes;
@@ -50,8 +52,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   // Step 4: Salon Details
   late TextEditingController _salonNameController;
-  String salonCategory = 'Premium'; // Basic, Medium, Premium, Ultra premium
-  List<String> salonServes = ['Unisex', 'Other'];
+  String salonCategory = ''; // Basic, Medium, Premium, Ultra premium
+  List<String> salonServes = [];
   late TextEditingController _customCategoryController;
 
   // Step 5: Location
@@ -62,10 +64,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   String selectedServiceCategory = 'Hair';
   final List<String> serviceCategories = ['Hair', 'Skin', 'Nails', 'Body'];
   final List<Map<String, dynamic>> services = [
-    {'category': 'Hair', 'name': 'Haircut (Men)', 'time': '30 min', 'price': '₹399', 'checked': true},
-    {'category': 'Hair', 'name': 'Haircut (Women)', 'time': '45 min', 'price': '₹699', 'checked': true},
-    {'category': 'Hair', 'name': 'Beard trim', 'time': '15 min', 'price': '₹149', 'checked': true},
-    {'category': 'Hair', 'name': 'Hair colour', 'time': '90 min', 'price': '₹2,499', 'checked': true},
+    {'category': 'Hair', 'name': 'Haircut (Men)', 'time': '30 min', 'price': '₹399', 'checked': false},
+    {'category': 'Hair', 'name': 'Haircut (Women)', 'time': '45 min', 'price': '₹699', 'checked': false},
+    {'category': 'Hair', 'name': 'Beard trim', 'time': '15 min', 'price': '₹149', 'checked': false},
+    {'category': 'Hair', 'name': 'Hair colour', 'time': '90 min', 'price': '₹2,499', 'checked': false},
     {'category': 'Hair', 'name': 'Hair spa', 'time': '60 min', 'price': '₹1,999', 'checked': false},
     {'category': 'Skin', 'name': 'Classic facial', 'time': '45 min', 'price': '₹899', 'checked': false},
     {'category': 'Skin', 'name': 'Clean-up', 'time': '30 min', 'price': '₹499', 'checked': false},
@@ -76,11 +78,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   ];
 
   // Step 7: Stylists
-  final List<Map<String, String>> stylists = [
-    {'initial': 'P', 'name': 'Priya Sharma', 'role': 'Hair specialist', 'services': 'Haircut, Hair colour, Beard trim'},
-    {'initial': 'R', 'name': 'Rahul Das', 'role': 'Skin specialist', 'services': 'Facial, Clean-up'},
-    {'initial': 'N', 'name': 'Neha Patel', 'role': 'Nail artist', 'services': 'Manicure, Pedicure'},
-  ];
+  final List<Map<String, String>> stylists = [];
 
   // Step 8: Timings
   Map<String, List<Map<String, dynamic>>> dayTimings = {
@@ -98,6 +96,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   // Step 9: Agreement
   bool agreeTerms = false;
+  bool _isSubmitting = false;
+  double _latitude = 0;
+  double _longitude = 0;
+  bool _hasLocation = false;
 
   @override
   void initState() {
@@ -121,23 +123,23 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     });
     final state = context.read<SalonAppState>();
 
-    _phoneController = TextEditingController(text: state.ownerPhone.isNotEmpty ? state.ownerPhone : '98765 43210');
+    _phoneController = TextEditingController(text: state.ownerPhone);
     _otpControllers = List.generate(6, (_) => TextEditingController());
     _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
-    _onboardingCodeController = TextEditingController(text: 'ZL-4821');
+    _onboardingCodeController = TextEditingController();
     _onboardingCodeController.addListener(_verifyOnboardingCode);
     _verifyOnboardingCode();
 
     _ownerNameController = TextEditingController(text: state.ownerName.isNotEmpty ? state.ownerName : '');
-    _emailController = TextEditingController(text: state.ownerEmail.isNotEmpty ? state.ownerEmail : 'rohan@glowstudio.in');
-    _gstController = TextEditingController(text: state.gstNumber.isNotEmpty ? state.gstNumber : '22ABCDE1234F1Z5');
+    _emailController = TextEditingController(text: state.ownerEmail);
+    _gstController = TextEditingController(text: state.gstNumber);
 
-    _salonNameController = TextEditingController(text: state.salonName.isNotEmpty ? state.salonName : 'Glow Studio');
-    _customCategoryController = TextEditingController(text: 'Kids salon');
+    _salonNameController = TextEditingController(text: state.salonName);
+    _customCategoryController = TextEditingController();
 
-    _addressController = TextEditingController(text: state.address.isNotEmpty ? state.address : 'Plot No. 123, Saheed Nagar, Near Big Bazaar, Bhubaneswar');
-    _pincodeController = TextEditingController(text: '751007');
+    _addressController = TextEditingController(text: state.address);
+    _pincodeController = TextEditingController();
 
     for (final controller in [
       _phoneController,
@@ -219,23 +221,44 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
   }
 
-  void _useCurrentLocation() {
-    setState(() {
-      _addressController.text = 'Plot No. 45, DLF Cybercity, Patia, Bhubaneswar, Odisha';
-      _pincodeController.text = '751024';
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Current GPS location detected and filled.'),
-        backgroundColor: ZalonoTheme.primary,
-      ),
-    );
+  Future<void> _useCurrentLocation() async {
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw StateError('Location services are disabled.');
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        throw StateError('Location permission was not granted.');
+      }
+      final position = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+        _hasLocation = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Current GPS coordinates detected.'),
+          backgroundColor: ZalonoTheme.primary,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not get current location: $error')),
+      );
+    }
   }
 
   void _addNewServiceDialog() {
     final nameCtrl = TextEditingController();
-    final priceCtrl = TextEditingController(text: '499');
-    final timeCtrl = TextEditingController(text: '30 min');
+    final priceCtrl = TextEditingController();
+    final timeCtrl = TextEditingController();
 
     showDialog(
       context: context,
@@ -340,8 +363,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
 
   void _addNewStylistDialog() {
     final nameCtrl = TextEditingController();
-    final roleCtrl = TextEditingController(text: 'Stylist');
-    final svcCtrl = TextEditingController(text: 'Haircut, Hair colour');
+    final roleCtrl = TextEditingController();
+    final svcCtrl = TextEditingController();
 
     showDialog(
       context: context,
@@ -565,8 +588,13 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
   }
 
-  void _nextStep() {
+  Future<void> _nextStep() async {
     if (!_isCurrentStepComplete) {
+      return;
+    }
+
+    if (_currentStep == 9) {
+      await _submitRegistration();
       return;
     }
 
@@ -621,6 +649,69 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         _currentStep++;
         _registrationScrollController.jumpTo(0);
       });
+    }
+  }
+
+  Future<void> _submitRegistration() async {
+    if (_isSubmitting) {
+      return;
+    }
+    if (!_hasLocation) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Use your current location before submitting.')),
+      );
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    try {
+      final selectedOfferings = services
+          .where((service) => service['checked'] == true)
+          .map((service) => Map<String, dynamic>.from(service))
+          .toList();
+      final selectedServiceNames = selectedOfferings
+          .map((service) => service['name']?.toString() ?? '')
+          .where((name) => name.isNotEmpty)
+          .toList();
+
+      await OnboardingApi().submit(
+        mobileNumber: _phoneController.text.trim(),
+        fullName: _ownerNameController.text.trim(),
+        email: _emailController.text.trim(),
+        gstNumber: _gstController.text.trim(),
+        salonName: _salonNameController.text.trim(),
+        salonCategory: salonCategory,
+        salonServices: selectedServiceNames,
+        serviceOfferings: selectedOfferings,
+        latitude: _latitude,
+        longitude: _longitude,
+        completeAddress: _addressController.text.trim(),
+        pincode: _pincodeController.text.trim(),
+        stylists: stylists.map((stylist) => Map<String, String>.from(stylist)).toList(),
+        timings: dayTimings,
+        panCard: panBytes,
+        panCardName: panFileName,
+        aadhaarCard: aadhaarBytes,
+        aadhaarCardName: aadhaarFileName,
+        businessProof: businessProofBytes,
+        businessProofName: businessProofFileName,
+        salonPhotos: salonPhotoBytes.where((photo) => photo.isNotEmpty).toList(),
+      );
+      if (!mounted) return;
+      setState(() {
+        _isSubmitting = false;
+        _currentStep = 10;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error.toString().replaceFirst('Bad state: ', ''),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -710,13 +801,22 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: isContinueDisabled ? null : _nextStep,
+                onPressed: isContinueDisabled || _isSubmitting ? null : _nextStep,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isContinueDisabled
                       ? const Color(0xFFD0CBC6)
                       : ZalonoTheme.primary,
                 ),
-                child: Text(_currentStep == 9 ? 'Submit for review' : 'Continue'),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(_currentStep == 9 ? 'Submit for review' : 'Continue'),
               ),
               if (_currentStep == 7) ...[
                 const SizedBox(height: 10),
