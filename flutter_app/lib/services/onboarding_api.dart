@@ -9,7 +9,7 @@ class OnboardingApi {
   }) : baseUrl = baseUrl ??
             const String.fromEnvironment(
               'ZALONO_API_BASE_URL',
-              defaultValue: 'https://zalono-partner-backend.onrender.com',
+              defaultValue: 'https://zalona-partner-app-1.onrender.com',
             );
 
   final String baseUrl;

@@ -77,7 +77,7 @@ authentication remains unavailable until this command is completed.
 
 The Android client is configured for the `zalono-partner` Firebase project.
 The production web build sends onboarding submissions to
-`https://zalono-partner-backend.onrender.com`; override this with
+`https://zalona-partner-app-1.onrender.com`; override this with
 `--dart-define=ZALONO_API_BASE_URL=https://your-backend.example.com` when
 building for another environment.
 
