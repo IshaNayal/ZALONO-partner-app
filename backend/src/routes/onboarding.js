@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { admin, db } = require('../firebase');
+const { admin, db, bucket } = require('../firebase');
 const { requireAuth } = require('../middleware/require-auth');
 
 const router = express.Router();
@@ -74,6 +74,33 @@ function validateArray(value, name) {
   return value;
 }
 
+async function storeUploadedFiles(files, uid) {
+  const stored = {};
+  for (const [fieldName, entries] of Object.entries(files || {})) {
+    stored[fieldName] = [];
+    for (const file of entries) {
+      const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const storagePath = `onboarding/${uid}/${Date.now()}-${safeName}`;
+      const storageFile = bucket.file(storagePath);
+      await storageFile.save(file.buffer, {
+        metadata: {
+          contentType: file.mimetype,
+          metadata: {
+            originalName: file.originalname
+          }
+        }
+      });
+      stored[fieldName].push({
+        path: storagePath,
+        originalName: file.originalname,
+        contentType: file.mimetype,
+        size: file.size
+      });
+    }
+  }
+  return stored;
+}
+
 router.put('/', requireAuth, uploadFields, async (req, res, next) => {
   try {
     const applicationRef = db.collection('onboardingApplications').doc(req.user.uid);
@@ -96,6 +123,8 @@ router.put('/', requireAuth, uploadFields, async (req, res, next) => {
     if (!timings || typeof timings !== 'object' || Array.isArray(timings)) {
       throw new Error('timings must be an object');
     }
+    const storedFiles = await storeUploadedFiles(req.files, req.user.uid);
+    const existingFiles = existingApplication.data() || {};
 
     const application = {
       mobileNumber: requireString(req.body, 'mobileNumber'),
@@ -111,8 +140,15 @@ router.put('/', requireAuth, uploadFields, async (req, res, next) => {
       pincode: requireString(req.body, 'pincode'),
       stylists,
       timings,
-      documents: {},
-      salonPhotos: [],
+      documents: storedFiles.panCard || storedFiles.aadhaarCard || storedFiles.businessProof
+        ? {
+            ...(existingFiles.documents || {}),
+            ...(storedFiles.panCard ? { panCard: storedFiles.panCard[0] } : {}),
+            ...(storedFiles.aadhaarCard ? { aadhaarCard: storedFiles.aadhaarCard[0] } : {}),
+            ...(storedFiles.businessProof ? { businessProof: storedFiles.businessProof[0] } : {})
+          }
+        : existingFiles.documents || {},
+      salonPhotos: storedFiles.salonPhotos || existingFiles.salonPhotos || [],
       status: 'submitted',
       ...(existingApplication.exists
         ? {}

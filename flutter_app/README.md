@@ -9,7 +9,7 @@ A complete mobile application for salon owners to register with an onboarding co
 ### 1. Registration Flow (`pp. 2–13`)
 - **R1 · Welcome**: Value prop ("Run your day from your phone"), live booking preview card, Log in / Partner buttons.
 - **R2 · Verify mobile**: 6-digit SMS OTP verification for salon credentials.
-- **R3 · Onboarding code**: Gatekeeper screen verifying partner code (`ZL-4821`) from a Zalono executive.
+- **R3 · Onboarding code**: Gatekeeper screen verifying partner code (`ZL-BBS-4821`) from a Zalono executive.
 - **R4 · About the owner**: Name, email with instant verify trigger, document checklist (PAN, Aadhaar, Business proof), and optional GST number.
 - **R5 · Verify email**: 6-digit email confirmation OTP.
 - **R6 · Salon details**: 3–5 photo gallery, name, tier category (Basic, Medium, Premium, Ultra Premium), clientele served (Men, Women, Unisex, Other), custom niche category.
@@ -74,6 +74,25 @@ flutter run -d android
 Firebase configuration generates `lib/firebase_options.dart`. The app can
 still open for local UI development before configuration, but Firebase
 authentication remains unavailable until this command is completed.
+
+The Android client is configured for the `zalono-partner` Firebase project.
+The production web build sends onboarding submissions to
+`https://zalono-partner-backend.onrender.com`; override this with
+`--dart-define=ZALONO_API_BASE_URL=https://your-backend.example.com` when
+building for another environment.
+
+### Android APK
+
+```bash
+flutter build apk --release
+```
+
+The APK is written to `build/app/outputs/flutter-apk/app-release.apk`. Firebase
+client configuration is bundled in the APK; Firebase Admin credentials must
+remain server-side in Render environment variables.
+
+The hosted web app publishes the release APK at
+`/downloads/zalono-partner.apk`.
 
 The registration upload uses Firebase Anonymous Authentication to obtain a
 verified ID token for the backend. Enable the **Anonymous** provider in

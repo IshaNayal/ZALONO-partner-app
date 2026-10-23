@@ -286,8 +286,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
   }
 
   Widget _buildHistorySubFilters(SalonAppState state) {
-    const totalCount = 42;
-    int noShows = state.historyBookings.where((b) => b.status == BookingStatus.noShow).length;
+    final totalCount = _getHistoryBookingCount(state);
+    final noShows =
+        state.historyBookings.where((b) => b.status == BookingStatus.noShow).length;
 
     return Column(
       children: [
@@ -337,6 +338,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
         ),
       ],
     );
+  }
+
+  int _getHistoryBookingCount(SalonAppState state) {
+    return state.historyBookings.length;
   }
 
   Widget _buildUpcomingList(SalonAppState state) {
@@ -402,13 +407,23 @@ class _BookingsScreenState extends State<BookingsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                booking.timeString,
+                '${_bookingTime(booking)} · ${_bookingDuration(booking)}',
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: ZalonoTheme.primary),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: ZalonoTheme.primary, borderRadius: BorderRadius.circular(12)),
-                child: const Text('In chair', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                decoration: BoxDecoration(
+                  color: ZalonoTheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'In chair',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ],
           ),
@@ -461,18 +476,19 @@ class _BookingsScreenState extends State<BookingsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(booking.timeString, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: booking.type == BookingType.walkIn ? ZalonoTheme.surfaceMuted : ZalonoTheme.primaryLight,
-                    borderRadius: BorderRadius.circular(12),
+                Text(_bookingTime(booking), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
+                if (booking.type != BookingType.walkIn)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: ZalonoTheme.primaryLight,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Confirmed',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ZalonoTheme.primary),
+                    ),
                   ),
-                  child: Text(
-                    booking.type == BookingType.walkIn ? 'Walk-in' : 'Confirmed',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ZalonoTheme.primary),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -486,6 +502,18 @@ class _BookingsScreenState extends State<BookingsScreen> {
         ),
       ),
     );
+  }
+
+  String _bookingTime(BookingItem booking) {
+    return DateFormat('h:mm a').format(booking.dateTime);
+  }
+
+  String _bookingDuration(BookingItem booking) {
+    final minutes = booking.services.fold(
+      0,
+      (total, service) => total + service.durationMinutes,
+    );
+    return '$minutes min';
   }
 
   Widget _buildHistoryList(SalonAppState state) {
@@ -559,7 +587,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _historyTime(b),
+                            _bookingTime(b),
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -568,7 +596,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '· ${_historyDuration(b)}',
+                            '· ${_bookingDuration(b)}',
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -631,20 +659,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   String _historyDateKey(BookingItem booking) {
     return booking.timeString.split(' · ').first;
-  }
-
-  String _historyTime(BookingItem booking) {
-    return booking.timeString.split(' · ').last == booking.timeString
-        ? booking.timeString
-        : booking.timeString.split(' · ').last;
-  }
-
-  String _historyDuration(BookingItem booking) {
-    final minutes = booking.services.fold(
-      0,
-      (total, service) => total + service.durationMinutes,
-    );
-    return '$minutes min';
   }
 
   String _historyDateLabel(BookingItem booking) {

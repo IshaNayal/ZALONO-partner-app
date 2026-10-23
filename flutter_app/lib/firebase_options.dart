@@ -21,10 +21,7 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for ios - '
@@ -60,5 +57,13 @@ class DefaultFirebaseOptions {
     authDomain: 'zalono-partner.firebaseapp.com',
     storageBucket: 'zalono-partner.firebasestorage.app',
     measurementId: 'G-L73VV8GTQ5',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyBI-mxuV3lnlCg3TENI22mK2-4u7LS9e3E',
+    appId: '1:924864828959:android:f14b79b1d5c414b36da72a',
+    messagingSenderId: '924864828959',
+    projectId: 'zalono-partner',
+    storageBucket: 'zalono-partner.firebasestorage.app',
   );
 }

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "924864828959",
+    "project_id": "zalono-partner",
+    "storage_bucket": "zalono-partner.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924864828959:android:f14b79b1d5c414b36da72a",
+        "android_client_info": {
+          "package_name": "com.zalono.zalono_partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI-mxuV3lnlCg3TENI22mK2-4u7LS9e3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924864828959:android:f28a8099317bd39c6da72a",
+        "android_client_info": {
+          "package_name": "zalono.partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI-mxuV3lnlCg3TENI22mK2-4u7LS9e3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

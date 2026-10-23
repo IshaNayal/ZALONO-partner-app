@@ -47,7 +47,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('STEP 2 OF 9'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'ZL-4821');
+    await tester.enterText(find.byType(TextField).first, 'ZL-BBS-4821');
     await tester.pumpAndSettle();
 
     // Continue to step 3

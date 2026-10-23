@@ -3,9 +3,9 @@
     "short_name": "zalono_partner",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F01938",
+    "theme_color": "#F01938",
+    "description": "Zalono Salon Partner",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

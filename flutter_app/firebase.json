@@ -1,1 +1,1 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"zalono-partner","configurations":{"web":"1:924864828959:web:0404c22a41a10e776da72a"}}}}}}
+{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"zalono-partner","configurations":{"android":"1:924864828959:android:f14b79b1d5c414b36da72a","web":"1:924864828959:web:0404c22a41a10e776da72a"}}},"android":{"default":{"projectId":"zalono-partner","appId":"1:924864828959:android:f14b79b1d5c414b36da72a","fileOutput":"android/app/google-services.json"}}}}}

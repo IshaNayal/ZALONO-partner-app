@@ -66,9 +66,9 @@ Firestore timestamp, plus `registrationDate`, `registrationTime`, and
 `registrationTimeZone` (`UTC`). These registration fields remain unchanged on
 later edits; `updatedAt` is refreshed on every save.
 
-Image and document persistence is currently disabled. Any uploaded image fields
-are accepted for backwards compatibility and discarded. The non-image fields
-are stored in Firestore. Firebase Storage can be enabled later without changing
-the Firestore application schema.
+Uploaded documents and salon photos are stored in Firebase Storage under the
+authenticated user's onboarding directory. Their storage paths and metadata are
+stored with the application document in Firestore. Enable Firebase Storage and
+set `FIREBASE_STORAGE_BUCKET` before accepting uploads.
 
 The Admin SDK verifies tokens against Firebase and rejects revoked tokens.

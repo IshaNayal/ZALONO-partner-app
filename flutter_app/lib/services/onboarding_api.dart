@@ -4,7 +4,13 @@ import 'package:http/http.dart' as http;
 import 'firebase_service.dart';
 
 class OnboardingApi {
-  OnboardingApi({this.baseUrl = 'http://localhost:8080'});
+  OnboardingApi({
+    String? baseUrl,
+  }) : baseUrl = baseUrl ??
+            const String.fromEnvironment(
+              'ZALONO_API_BASE_URL',
+              defaultValue: 'https://zalono-partner-backend.onrender.com',
+            );
 
   final String baseUrl;
 

@@ -37,7 +37,7 @@ class _MoreScreenState extends State<MoreScreen> {
         context, MaterialPageRoute(builder: (_) => const SupportScreen()));
   }
 
-  void _showLogoutDialog() {
+  void _showLogoutDialog(String salonName) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -51,9 +51,9 @@ class _MoreScreenState extends State<MoreScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '𝗟𝗼𝗴 𝗢𝘂𝘁 ?',
-              style: TextStyle(
+            Text(
+              'Log out of $salonName?',
+              style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: ZalonoTheme.textPrimary),
@@ -204,7 +204,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: ListTile(
-                  onTap: _showLogoutDialog,
+                  onTap: () => _showLogoutDialog(appState.salonName),
                   leading: const Icon(Icons.logout, color: ZalonoTheme.primary),
                   title: const Text('Log out',
                       style: TextStyle(

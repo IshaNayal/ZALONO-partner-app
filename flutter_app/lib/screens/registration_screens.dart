@@ -211,7 +211,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   }
 
   void _verifyOnboardingCode() {
-    final isVerified = _onboardingCodeController.text.trim() == 'ZL-4821';
+    final isVerified = _onboardingCodeController.text.trim() == 'ZL-BBS-4821';
     if (codeVerified != isVerified && mounted) {
       setState(() {
         codeVerified = isVerified;
