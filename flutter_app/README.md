@@ -91,8 +91,8 @@ The APK is written to `build/app/outputs/flutter-apk/app-release.apk`. Firebase
 client configuration is bundled in the APK; Firebase Admin credentials must
 remain server-side in Render environment variables.
 
-The hosted web app publishes the release APK at
-`/downloads/zalono-partner.apk`.
+The hosted web app publishes the current release APK at
+`/downloads/zalono-partner-v2.apk`.
 
 The registration upload uses Firebase Anonymous Authentication to obtain a
 verified ID token for the backend. Enable the **Anonymous** provider in
