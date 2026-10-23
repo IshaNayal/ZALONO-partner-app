@@ -28,6 +28,14 @@ app.use(cors({
   }
 }));
 
+app.get('/', (_req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'zalono-partner-backend',
+    health: '/health'
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'zalono-partner-backend' });
 });
