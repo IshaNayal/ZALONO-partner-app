@@ -71,7 +71,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 Navigator.pop(ctx);
                 final preferences = await SharedPreferences.getInstance();
                 await preferences.remove('logged_in');
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushReplacementNamed(ctx, '/');
               },
               child: const Text('Log out'),
             ),
