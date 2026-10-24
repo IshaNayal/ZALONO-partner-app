@@ -76,10 +76,20 @@ still open for local UI development before configuration, but Firebase
 authentication remains unavailable until this command is completed.
 
 The Android client is configured for the `zalono-partner` Firebase project.
-The production web build sends onboarding submissions to
-`https://zalona-partner-app-1.onrender.com`; override this with
-`--dart-define=ZALONO_API_BASE_URL=https://your-backend.example.com` when
-building for another environment.
+The local web build sends onboarding submissions to
+`http://localhost:8080` by default. Start the backend from the `backend`
+directory with `npm start`. To test from another device on the same network,
+find the computer's LAN IP and run Flutter with:
+
+```bash
+flutter run -d chrome --web-hostname 0.0.0.0 \
+  --dart-define=ZALONO_API_BASE_URL=http://192.168.1.10:8080
+```
+
+Replace `192.168.1.10` with the computer's LAN IP. The backend listens on all
+local network interfaces, and accepts private-network browser origins.
+Production builds can override this with
+`--dart-define=ZALONO_API_BASE_URL=https://your-backend.example.com`.
 
 ### Android APK
 

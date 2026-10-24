@@ -13,15 +13,30 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
-const isDevelopment = process.env.NODE_ENV !== 'production';
+
+function isLocalNetworkOrigin(origin) {
+  try {
+    const { hostname, protocol } = new URL(origin);
+    if (protocol !== 'http:' && protocol !== 'https:') return false;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    const octets = hostname.split('.').map(Number);
+    if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)) {
+      return false;
+    }
+    return octets[0] === 10 ||
+      (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+      (octets[0] === 192 && octets[1] === 168);
+  } catch (_) {
+    return false;
+  }
+}
 
 app.use(helmet());
 app.use(express.json({ limit: '100kb' }));
 app.use(cors({
   origin(origin, callback) {
-    const isLocalOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || '');
     if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin) ||
-        (isDevelopment && isLocalOrigin)) {
+        isLocalNetworkOrigin(origin)) {
       return callback(null, true);
     }
     return callback(new Error('Origin is not allowed by CORS'));
@@ -56,7 +71,7 @@ app.use((error, _req, res, _next) => {
 });
 
 if (require.main === module) {
-  app.listen(port, () => {
+  app.listen(port, '0.0.0.0', () => {
     console.log(`Zalono Partner backend listening on port ${port}`);
   });
 }

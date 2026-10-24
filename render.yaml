@@ -27,4 +27,4 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT_JSON
         sync: false
       - key: ALLOWED_ORIGINS
-        value: https://zalono-partner-app.onrender.com
+        value: https://zalona-partner-app-1.onrender.com

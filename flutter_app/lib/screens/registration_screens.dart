@@ -64,17 +64,83 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   String selectedServiceCategory = 'Hair';
   final List<String> serviceCategories = ['Hair', 'Skin', 'Nails', 'Body'];
   final List<Map<String, dynamic>> services = [
-    {'category': 'Hair', 'name': 'Haircut (Men)', 'time': '30 min', 'price': '₹399', 'checked': false},
-    {'category': 'Hair', 'name': 'Haircut (Women)', 'time': '45 min', 'price': '₹699', 'checked': false},
-    {'category': 'Hair', 'name': 'Beard trim', 'time': '15 min', 'price': '₹149', 'checked': false},
-    {'category': 'Hair', 'name': 'Hair colour', 'time': '90 min', 'price': '₹2,499', 'checked': false},
-    {'category': 'Hair', 'name': 'Hair spa', 'time': '60 min', 'price': '₹1,999', 'checked': false},
-    {'category': 'Skin', 'name': 'Classic facial', 'time': '45 min', 'price': '₹899', 'checked': false},
-    {'category': 'Skin', 'name': 'Clean-up', 'time': '30 min', 'price': '₹499', 'checked': false},
-    {'category': 'Nails', 'name': 'Manicure', 'time': '30 min', 'price': '₹399', 'checked': false},
-    {'category': 'Nails', 'name': 'Pedicure', 'time': '45 min', 'price': '₹599', 'checked': false},
-    {'category': 'Body', 'name': 'Body massage', 'time': '60 min', 'price': '₹1,499', 'checked': false},
-    {'category': 'Body', 'name': 'Body scrub', 'time': '45 min', 'price': '₹999', 'checked': false},
+    {
+      'category': 'Hair',
+      'name': 'Haircut (Men)',
+      'time': '30 min',
+      'price': '₹399',
+      'checked': false
+    },
+    {
+      'category': 'Hair',
+      'name': 'Haircut (Women)',
+      'time': '45 min',
+      'price': '₹699',
+      'checked': false
+    },
+    {
+      'category': 'Hair',
+      'name': 'Beard trim',
+      'time': '15 min',
+      'price': '₹149',
+      'checked': false
+    },
+    {
+      'category': 'Hair',
+      'name': 'Hair colour',
+      'time': '90 min',
+      'price': '₹2,499',
+      'checked': false
+    },
+    {
+      'category': 'Hair',
+      'name': 'Hair spa',
+      'time': '60 min',
+      'price': '₹1,999',
+      'checked': false
+    },
+    {
+      'category': 'Skin',
+      'name': 'Classic facial',
+      'time': '45 min',
+      'price': '₹899',
+      'checked': false
+    },
+    {
+      'category': 'Skin',
+      'name': 'Clean-up',
+      'time': '30 min',
+      'price': '₹499',
+      'checked': false
+    },
+    {
+      'category': 'Nails',
+      'name': 'Manicure',
+      'time': '30 min',
+      'price': '₹399',
+      'checked': false
+    },
+    {
+      'category': 'Nails',
+      'name': 'Pedicure',
+      'time': '45 min',
+      'price': '₹599',
+      'checked': false
+    },
+    {
+      'category': 'Body',
+      'name': 'Body massage',
+      'time': '60 min',
+      'price': '₹1,499',
+      'checked': false
+    },
+    {
+      'category': 'Body',
+      'name': 'Body scrub',
+      'time': '45 min',
+      'price': '₹999',
+      'checked': false
+    },
   ];
 
   // Step 7: Stylists
@@ -86,12 +152,24 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       {'slot': '10:00 AM – 2:00 PM', 'on': true},
       {'slot': '4:00 PM – 10:00 PM', 'on': true},
     ],
-    'Tue': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
-    'Wed': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
-    'Thu': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
-    'Fri': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
-    'Sat': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
-    'Sun': [{'slot': '10:00 AM – 10:00 PM', 'on': true}],
+    'Tue': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
+    'Wed': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
+    'Thu': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
+    'Fri': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
+    'Sat': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
+    'Sun': [
+      {'slot': '10:00 AM – 10:00 PM', 'on': true}
+    ],
   };
 
   // Step 9: Agreement
@@ -131,7 +209,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     _onboardingCodeController.addListener(_verifyOnboardingCode);
     _verifyOnboardingCode();
 
-    _ownerNameController = TextEditingController(text: state.ownerName.isNotEmpty ? state.ownerName : '');
+    _ownerNameController = TextEditingController(
+        text: state.ownerName.isNotEmpty ? state.ownerName : '');
     _emailController = TextEditingController(text: state.ownerEmail);
     _gstController = TextEditingController(text: state.gstNumber);
 
@@ -263,7 +342,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Add Service in $selectedServiceCategory', style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Text('Add Service in $selectedServiceCategory',
+            style: const TextStyle(fontWeight: FontWeight.w800)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -271,17 +351,26 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               controller: nameCtrl,
               decoration: InputDecoration(
                 labelText: 'Service Name',
-                hintText: 'e.g. ${_serviceHintForCategory(selectedServiceCategory)}',
+                hintText:
+                    'e.g. ${_serviceHintForCategory(selectedServiceCategory)}',
               ),
             ),
             const SizedBox(height: 10),
-            TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Price', prefixText: '₹')),
+            TextField(
+                controller: priceCtrl,
+                keyboardType: TextInputType.number,
+                decoration:
+                    const InputDecoration(labelText: 'Price', prefixText: '₹')),
             const SizedBox(height: 10),
-            TextField(controller: timeCtrl, decoration: const InputDecoration(labelText: 'Duration', hintText: 'e.g. 30 min')),
+            TextField(
+                controller: timeCtrl,
+                decoration: const InputDecoration(
+                    labelText: 'Duration', hintText: 'e.g. 30 min')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameCtrl.text.trim().isNotEmpty) {
@@ -289,17 +378,21 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                   services.add({
                     'category': selectedServiceCategory,
                     'name': nameCtrl.text.trim(),
-                    'time': timeCtrl.text.trim().isEmpty ? '30 min' : timeCtrl.text.trim(),
+                    'time': timeCtrl.text.trim().isEmpty
+                        ? '30 min'
+                        : timeCtrl.text.trim(),
                     'price': '₹${priceCtrl.text.trim()}',
                     'checked': true,
                   });
                 });
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Added ${nameCtrl.text.trim()} to services!'), backgroundColor: ZalonoTheme.primary),
+                  SnackBar(
+                      content:
+                          Text('Added ${nameCtrl.text.trim()} to services!'),
+                      backgroundColor: ZalonoTheme.primary),
                 );
               }
-
             },
             child: const Text('Add Service'),
           ),
@@ -314,7 +407,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add service domain', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text('Add service domain',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         content: TextField(
           controller: domainCtrl,
           textCapitalization: TextCapitalization.words,
@@ -332,7 +426,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             onPressed: () {
               final domain = domainCtrl.text.trim();
               if (domain.isEmpty ||
-                  serviceCategories.any((category) => category.toLowerCase() == domain.toLowerCase())) {
+                  serviceCategories.any((category) =>
+                      category.toLowerCase() == domain.toLowerCase())) {
                 return;
               }
               setState(() {
@@ -369,19 +464,31 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add Stylist', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text('Add Stylist',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name', hintText: 'e.g. Deepak Kumar')),
+            TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                    labelText: 'Full Name', hintText: 'e.g. Deepak Kumar')),
             const SizedBox(height: 10),
-            TextField(controller: roleCtrl, decoration: const InputDecoration(labelText: 'Role', hintText: 'e.g. Hair specialist')),
+            TextField(
+                controller: roleCtrl,
+                decoration: const InputDecoration(
+                    labelText: 'Role', hintText: 'e.g. Hair specialist')),
             const SizedBox(height: 10),
-            TextField(controller: svcCtrl, decoration: const InputDecoration(labelText: 'Services', hintText: 'e.g. Haircut, Beard trim')),
+            TextField(
+                controller: svcCtrl,
+                decoration: const InputDecoration(
+                    labelText: 'Services',
+                    hintText: 'e.g. Haircut, Beard trim')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (nameCtrl.text.trim().isNotEmpty) {
@@ -396,7 +503,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                 });
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$name added to salon stylists!'), backgroundColor: ZalonoTheme.primary),
+                  SnackBar(
+                      content: Text('$name added to salon stylists!'),
+                      backgroundColor: ZalonoTheme.primary),
                 );
               }
             },
@@ -439,10 +548,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   }
 
   void _addNewTimingSlot(String day) async {
-    final start = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 10, minute: 0));
+    final start = await showTimePicker(
+        context: context, initialTime: const TimeOfDay(hour: 10, minute: 0));
     if (!mounted || start == null) return;
 
-    final end = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 18, minute: 0));
+    final end = await showTimePicker(
+        context: context, initialTime: const TimeOfDay(hour: 18, minute: 0));
     if (!mounted || end == null) return;
 
     final startStr = start.format(context);
@@ -452,7 +563,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
       dayTimings[day]?.add({'slot': '$startStr – $endStr', 'on': true});
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Added timing $startStr – $endStr to $day!'), backgroundColor: ZalonoTheme.primary),
+      SnackBar(
+          content: Text('Added timing $startStr – $endStr to $day!'),
+          backgroundColor: ZalonoTheme.primary),
     );
   }
 
@@ -469,7 +582,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Monday's timings copied to all days!"), backgroundColor: ZalonoTheme.primary),
+        const SnackBar(
+            content: Text("Monday's timings copied to all days!"),
+            backgroundColor: ZalonoTheme.primary),
       );
     }
   }
@@ -489,7 +604,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           }
         });
         if (mounted) {
-          final activePhotos = salonPhotoBytes.where((p) => p.isNotEmpty).toList();
+          final activePhotos =
+              salonPhotoBytes.where((p) => p.isNotEmpty).toList();
           // Immediately update SalonAppState so it is available in More -> Salon profile!
           context.read<SalonAppState>().setSalonPhotos(activePhotos);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -532,7 +648,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           }
         });
         if (mounted) {
-          context.read<SalonAppState>().setDocument(title, picked.bytes, picked.name);
+          context
+              .read<SalonAppState>()
+              .setDocument(title, picked.bytes, picked.name);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$title uploaded: ${picked.name}'),
@@ -611,16 +729,18 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     final activePhotos = salonPhotoBytes.where((p) => p.isNotEmpty).toList();
     // Sync all currently entered registration details to SalonAppState
     context.read<SalonAppState>().updateSalonRegistrationDetails(
-      name: _salonNameController.text.trim(),
-      category: salonCategory,
-      serves: salonServes.join(', '),
-      fullAddress: '${_addressController.text.trim()} ${_pincodeController.text.trim()}'.trim(),
-      owner: _ownerNameController.text.trim(),
-      phone: _phoneController.text.trim(),
-      email: _emailController.text.trim(),
-      gst: _gstController.text.trim(),
-      photos: activePhotos,
-    );
+          name: _salonNameController.text.trim(),
+          category: salonCategory,
+          serves: salonServes.join(', '),
+          fullAddress:
+              '${_addressController.text.trim()} ${_pincodeController.text.trim()}'
+                  .trim(),
+          owner: _ownerNameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          email: _emailController.text.trim(),
+          gst: _gstController.text.trim(),
+          photos: activePhotos,
+        );
 
     if (_currentStep == 3) {
       if (!_isVerifyingEmail && !emailVerified) {
@@ -658,7 +778,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     }
     if (!_hasLocation) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Use your current location before submitting.')),
+        const SnackBar(
+            content: Text('Use your current location before submitting.')),
       );
       return;
     }
@@ -686,7 +807,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         longitude: _longitude,
         completeAddress: _addressController.text.trim(),
         pincode: _pincodeController.text.trim(),
-        stylists: stylists.map((stylist) => Map<String, String>.from(stylist)).toList(),
+        stylists: stylists
+            .map((stylist) => Map<String, String>.from(stylist))
+            .toList(),
         timings: dayTimings,
         panCard: panBytes,
         panCardName: panFileName,
@@ -694,7 +817,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
         aadhaarCardName: aadhaarFileName,
         businessProof: businessProofBytes,
         businessProofName: businessProofFileName,
-        salonPhotos: salonPhotoBytes.where((photo) => photo.isNotEmpty).toList(),
+        salonPhotos:
+            salonPhotoBytes.where((photo) => photo.isNotEmpty).toList(),
       );
       if (!mounted) return;
       setState(() {
@@ -776,7 +900,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                     height: 4,
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color: active ? ZalonoTheme.primary : const Color(0xFFE8DFD8),
+                      color: active
+                          ? ZalonoTheme.primary
+                          : const Color(0xFFE8DFD8),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -801,7 +927,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: isContinueDisabled || _isSubmitting ? null : _nextStep,
+                onPressed:
+                    isContinueDisabled || _isSubmitting ? null : _nextStep,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isContinueDisabled
                       ? const Color(0xFFD0CBC6)
@@ -816,7 +943,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(_currentStep == 9 ? 'Submit for review' : 'Continue'),
+                    : Text(
+                        _currentStep == 9 ? 'Submit for review' : 'Continue'),
               ),
               if (_currentStep == 7) ...[
                 const SizedBox(height: 10),
@@ -825,7 +953,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                     onPressed: _nextStep,
                     child: const Text(
                       'Skip for now',
-                      style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                          color: ZalonoTheme.primary,
+                          fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),
@@ -885,7 +1015,11 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
         ),
         const SizedBox(height: 24),
-        const Text('MOBILE NUMBER', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('MOBILE NUMBER',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           height: 56,
@@ -897,7 +1031,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           ),
           child: Row(
             children: [
-              const Text('+91', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              const Text('+91',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(width: 10),
               Container(width: 1, height: 24, color: ZalonoTheme.border),
               const SizedBox(width: 12),
@@ -905,7 +1040,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                 child: TextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
@@ -914,12 +1050,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                   onChanged: (_) => setState(() {}),
                 ),
               ),
-              const Icon(Icons.edit_outlined, size: 18, color: ZalonoTheme.primary),
+              const Icon(Icons.edit_outlined,
+                  size: 18, color: ZalonoTheme.primary),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        const Text('ENTER THE 6-DIGIT CODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('ENTER THE 6-DIGIT CODE',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
@@ -940,7 +1081,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                       border: Border.all(
                         color: isFocused
                             ? ZalonoTheme.primary
-                            : (hasVal ? ZalonoTheme.textPrimary : ZalonoTheme.border),
+                            : (hasVal
+                                ? ZalonoTheme.textPrimary
+                                : ZalonoTheme.border),
                         width: isFocused ? 1.8 : 1,
                       ),
                     ),
@@ -950,7 +1093,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w800),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         counterText: '',
@@ -975,16 +1119,21 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             children: [
               Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
               SizedBox(width: 6),
-              Text('Number verified', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+              Text('Number verified',
+                  style: TextStyle(
+                      color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(
+                color: ZalonoTheme.primaryLight,
+                borderRadius: BorderRadius.circular(16)),
             child: const Text(
               'Next you will enter an onboarding code from your Zalono executive. Registration stays locked without it.',
-              style: TextStyle(color: ZalonoTheme.primaryDark, fontSize: 13, height: 1.4),
+              style: TextStyle(
+                  color: ZalonoTheme.primaryDark, fontSize: 13, height: 1.4),
             ),
           ),
         ],
@@ -1015,7 +1164,11 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
         ),
         const SizedBox(height: 24),
-        const Text('ONBOARDING CODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('ONBOARDING CODE',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1030,8 +1183,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
               Expanded(
                 child: TextField(
                   controller: _onboardingCodeController,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: 1.5),
-                  decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5),
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, isDense: true),
                 ),
               ),
               const CircleAvatar(
@@ -1043,15 +1200,18 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           ),
         ),
         if (codeVerified) ...[
-const SizedBox(height: 12),
-        if (codeVerified)
-          const Row(
-            children: [
-              Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
-              SizedBox(width: 6),
-              Text('Code verified · registration unlocked', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
-            ],
-          ),
+          const SizedBox(height: 12),
+          if (codeVerified)
+            const Row(
+              children: [
+                Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
+                SizedBox(width: 6),
+                Text('Code verified · registration unlocked',
+                    style: TextStyle(
+                        color: ZalonoTheme.primary,
+                        fontWeight: FontWeight.w700)),
+              ],
+            ),
         ],
         const SizedBox(height: 20),
         GestureDetector(
@@ -1064,6 +1224,7 @@ const SizedBox(height: 12),
       ],
     );
   }
+
 //
   // R4 · About the owner (Step 3 of 9)
   Widget _buildR4AboutOwner() {
@@ -1082,24 +1243,39 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 24),
-        const Text('FULL NAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('FULL NAME',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _ownerNameController,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
         const SizedBox(height: 16),
-        const Text('EMAIL ID', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('EMAIL ID',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1107,8 +1283,10 @@ const SizedBox(height: 12),
                 child: TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                  decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w600),
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, isDense: true),
                 ),
               ),
               GestureDetector(
@@ -1118,9 +1296,12 @@ const SizedBox(height: 12),
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: emailVerified ? ZalonoTheme.primaryLight : ZalonoTheme.primary,
+                    color: emailVerified
+                        ? ZalonoTheme.primaryLight
+                        : ZalonoTheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -1140,8 +1321,16 @@ const SizedBox(height: 12),
         const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('DOCUMENTS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
-            Text('All optional', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: ZalonoTheme.primary)),
+            Text('DOCUMENTS',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: ZalonoTheme.textSecondary)),
+            Text('All optional',
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: ZalonoTheme.primary)),
           ],
         ),
         const SizedBox(height: 10),
@@ -1204,16 +1393,24 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 20),
-        const Text('GST NUMBER · optional', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('GST NUMBER · optional',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _gstController,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
       ],
@@ -1240,7 +1437,8 @@ const SizedBox(height: 12),
         const SizedBox(height: 8),
         Text.rich(
           TextSpan(
-            style: const TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
+            style:
+                const TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
             children: [
               const TextSpan(text: 'We sent a 6-digit code to '),
               TextSpan(
@@ -1254,28 +1452,38 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 24),
-        const Text('ENTER THE 6-DIGIT CODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('ENTER THE 6-DIGIT CODE',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: ['5', '3', '8', '2', '0', '4'].map((digit) => Container(
-            width: 46,
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ZalonoTheme.border),
-            ),
-            child: Text(digit, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-          )).toList(),
+          children: ['5', '3', '8', '2', '0', '4']
+              .map((digit) => Container(
+                    width: 46,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: ZalonoTheme.border),
+                    ),
+                    child: Text(digit,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w800)),
+                  ))
+              .toList(),
         ),
         const SizedBox(height: 12),
         const Row(
           children: [
             Icon(Icons.check, size: 16, color: ZalonoTheme.primary),
             SizedBox(width: 6),
-            Text('Email verified', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+            Text('Email verified',
+                style: TextStyle(
+                    color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
           ],
         ),
         const SizedBox(height: 20),
@@ -1287,7 +1495,10 @@ const SizedBox(height: 12),
           },
           child: const Text(
             'Wrong email? Change it',
-            style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 14),
+            style: TextStyle(
+                color: ZalonoTheme.primary,
+                fontWeight: FontWeight.w700,
+                fontSize: 14),
           ),
         ),
       ],
@@ -1363,10 +1574,12 @@ const SizedBox(height: 12),
             ),
             added
                 ? Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: ZalonoTheme.primary, width: 1.2),
+                      border:
+                          Border.all(color: ZalonoTheme.primary, width: 1.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Row(
@@ -1386,7 +1599,8 @@ const SizedBox(height: 12),
                     ),
                   )
                 : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFDE8EC),
                       borderRadius: BorderRadius.circular(20),
@@ -1406,7 +1620,8 @@ const SizedBox(height: 12),
     );
   }
 
-  void _showDocPreviewSheet(String title, Uint8List? bytes, String? fileName, VoidCallback onReplace, VoidCallback onRemove) {
+  void _showDocPreviewSheet(String title, Uint8List? bytes, String? fileName,
+      VoidCallback onReplace, VoidCallback onRemove) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1426,7 +1641,10 @@ const SizedBox(height: 12),
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF1E1E1E)),
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E1E1E)),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -1448,7 +1666,8 @@ const SizedBox(height: 12),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.picture_as_pdf_rounded, color: ZalonoTheme.primary, size: 48),
+                      const Icon(Icons.picture_as_pdf_rounded,
+                          color: ZalonoTheme.primary, size: 48),
                       const SizedBox(height: 8),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1457,7 +1676,10 @@ const SizedBox(height: 12),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E1E1E), fontSize: 13),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E1E1E),
+                              fontSize: 13),
                         ),
                       ),
                     ],
@@ -1485,9 +1707,13 @@ const SizedBox(height: 12),
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_circle_outline, color: ZalonoTheme.primary, size: 36),
+                    Icon(Icons.check_circle_outline,
+                        color: ZalonoTheme.primary, size: 36),
                     SizedBox(height: 6),
-                    Text('Document on file', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+                    Text('Document on file',
+                        style: TextStyle(
+                            color: ZalonoTheme.primary,
+                            fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -1496,7 +1722,10 @@ const SizedBox(height: 12),
             if (fileName != null)
               Text(
                 'File: $fileName',
-                style: const TextStyle(fontSize: 13, color: Color(0xFF6B6864), fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF6B6864),
+                    fontWeight: FontWeight.w500),
               ),
             const SizedBox(height: 20),
             Row(
@@ -1509,10 +1738,14 @@ const SizedBox(height: 12),
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: ZalonoTheme.primary),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('Replace Photo', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+                    child: const Text('Replace Photo',
+                        style: TextStyle(
+                            color: ZalonoTheme.primary,
+                            fontWeight: FontWeight.w700)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1526,10 +1759,12 @@ const SizedBox(height: 12),
                       backgroundColor: const Color(0xFFFDE8EC),
                       foregroundColor: ZalonoTheme.primary,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text('Remove', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Remove',
+                        style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],
@@ -1557,7 +1792,11 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 20),
-        const Text('SALON PHOTOS · 3 TO 5', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('SALON PHOTOS · 3 TO 5',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -1584,7 +1823,8 @@ const SizedBox(height: 12),
                   width: 70,
                   height: 70,
                   decoration: BoxDecoration(
-                    border: Border.all(color: ZalonoTheme.primary, style: BorderStyle.solid),
+                    border: Border.all(
+                        color: ZalonoTheme.primary, style: BorderStyle.solid),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(Icons.add, color: ZalonoTheme.primary),
@@ -1594,20 +1834,32 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 24),
-        const Text('SALON NAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('SALON NAME',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _salonNameController,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
         const SizedBox(height: 20),
-        const Text('SALON CATEGORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('SALON CATEGORY',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 8),
         Row(
           children: ['Basic', 'Medium', 'Premium', 'Ultra premium'].map((cat) {
@@ -1621,7 +1873,9 @@ const SizedBox(height: 12),
                   decoration: BoxDecoration(
                     color: active ? ZalonoTheme.primary : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                    border: Border.all(
+                        color:
+                            active ? ZalonoTheme.primary : ZalonoTheme.border),
                   ),
                   child: Center(
                     child: Text(
@@ -1640,7 +1894,11 @@ const SizedBox(height: 12),
           }).toList(),
         ),
         const SizedBox(height: 20),
-        const Text('SALON SERVES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('SALON SERVES',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 8),
         Row(
           children: ['Men', 'Women', 'Unisex', 'Other'].map((srv) {
@@ -1662,7 +1920,9 @@ const SizedBox(height: 12),
                   decoration: BoxDecoration(
                     color: active ? ZalonoTheme.primary : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                    border: Border.all(
+                        color:
+                            active ? ZalonoTheme.primary : ZalonoTheme.border),
                   ),
                   child: Center(
                     child: Text(
@@ -1680,16 +1940,24 @@ const SizedBox(height: 12),
           }).toList(),
         ),
         const SizedBox(height: 20),
-        const Text('YOUR CATEGORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('YOUR CATEGORY',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _customCategoryController,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
         const SizedBox(height: 8),
@@ -1702,7 +1970,8 @@ const SizedBox(height: 12),
   }
 
   Widget _buildPhotoBox(int index, String? label, bool isCover) {
-    final hasPhoto = index < salonPhotoBytes.length && salonPhotoBytes[index].isNotEmpty;
+    final hasPhoto =
+        index < salonPhotoBytes.length && salonPhotoBytes[index].isNotEmpty;
     return GestureDetector(
       onTap: () => _pickSalonPhoto(index: index),
       child: Container(
@@ -1724,15 +1993,23 @@ const SizedBox(height: 12),
                 ),
               )
             else
-              const Icon(Icons.add_photo_alternate_outlined, color: Colors.white70, size: 24),
+              const Icon(Icons.add_photo_alternate_outlined,
+                  color: Colors.white70, size: 24),
             if (isCover)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 6),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                  child: const Text('Cover', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: ZalonoTheme.primary)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6)),
+                  child: const Text('Cover',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: ZalonoTheme.primary)),
                 ),
               ),
           ],
@@ -1777,7 +2054,8 @@ const SizedBox(height: 12),
                 size: const Size(double.infinity, 180),
                 painter: _MapRoadPainter(),
               ),
-              const Icon(Icons.location_on, size: 48, color: ZalonoTheme.primary),
+              const Icon(Icons.location_on,
+                  size: 48, color: ZalonoTheme.primary),
             ],
           ),
         ),
@@ -1788,34 +2066,54 @@ const SizedBox(height: 12),
             children: [
               Icon(Icons.my_location, size: 18, color: ZalonoTheme.primary),
               SizedBox(width: 8),
-              Text('Use my current location', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 14)),
+              Text('Use my current location',
+                  style: TextStyle(
+                      color: ZalonoTheme.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14)),
             ],
           ),
         ),
         const SizedBox(height: 20),
-        const Text('COMPLETE ADDRESS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('COMPLETE ADDRESS',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _addressController,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
         const SizedBox(height: 16),
-        const Text('PINCODE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ZalonoTheme.textSecondary)),
+        const Text('PINCODE',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ZalonoTheme.border)),
           child: TextField(
             controller: _pincodeController,
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            decoration: const InputDecoration(border: InputBorder.none, isDense: true),
+            decoration:
+                const InputDecoration(border: InputBorder.none, isDense: true),
           ),
         ),
       ],
@@ -1848,7 +2146,8 @@ const SizedBox(height: 12),
           ),
         ),
         const SizedBox(height: 8),
-        const Text('Tick what you offer. Tap a time or price to change it.', style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary)),
+        const Text('Tick what you offer. Tap a time or price to change it.',
+            style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary)),
         const SizedBox(height: 20),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -1865,18 +2164,25 @@ const SizedBox(height: 12),
                 },
                 child: Container(
                   margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: active ? ZalonoTheme.primary : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: active ? ZalonoTheme.primary : ZalonoTheme.border),
+                    border: Border.all(
+                        color:
+                            active ? ZalonoTheme.primary : ZalonoTheme.border),
                   ),
                   child: Text(
                     cat,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: active ? Colors.white : (cat == '+ Add' ? ZalonoTheme.primary : ZalonoTheme.textPrimary),
+                      color: active
+                          ? Colors.white
+                          : (cat == '+ Add'
+                              ? ZalonoTheme.primary
+                              : ZalonoTheme.textPrimary),
                     ),
                   ),
                 ),
@@ -1919,26 +2225,30 @@ const SizedBox(height: 12),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                               color: ZalonoTheme.surfaceMuted,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               service['time'],
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 12),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                               color: ZalonoTheme.surfaceMuted,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               service['price'],
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 13),
                             ),
                           ),
                         ],
@@ -1958,13 +2268,15 @@ const SizedBox(height: 12),
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
-              border: Border.all(color: ZalonoTheme.primary, style: BorderStyle.solid),
+              border: Border.all(
+                  color: ZalonoTheme.primary, style: BorderStyle.solid),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
                 '+ Add service in $selectedServiceCategory',
-                style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                    color: ZalonoTheme.primary, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -2004,8 +2316,14 @@ const SizedBox(height: 12),
             const SizedBox(width: 10),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(8)),
-              child: const Text('Optional', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ZalonoTheme.primary)),
+              decoration: BoxDecoration(
+                  color: ZalonoTheme.primaryLight,
+                  borderRadius: BorderRadius.circular(8)),
+              child: const Text('Optional',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: ZalonoTheme.primary)),
             ),
           ],
         ),
@@ -2025,49 +2343,70 @@ const SizedBox(height: 12),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Center(
-              child: Text('+ Add stylist', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+              child: Text('+ Add stylist',
+                  style: TextStyle(
+                      color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
             ),
           ),
         ),
         const SizedBox(height: 16),
         ...stylists.map((st) => GestureDetector(
-          onLongPress: () => _confirmDeleteStylist(st),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ZalonoTheme.border)),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundColor: ZalonoTheme.primaryLight,
-                  radius: 20,
-                  child: Text(st['initial']!, style: const TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w800, fontSize: 16)),
+              onLongPress: () => _confirmDeleteStylist(st),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: ZalonoTheme.border)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: ZalonoTheme.primaryLight,
+                      radius: 20,
+                      child: Text(st['initial']!,
+                          style: const TextStyle(
+                              color: ZalonoTheme.primary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16)),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(st['name']!,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w800)),
+                          const SizedBox(height: 2),
+                          Text(st['role']!,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: ZalonoTheme.textSecondary)),
+                          const SizedBox(height: 4),
+                          Text(st['services']!,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: ZalonoTheme.primary,
+                                  fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(st['name']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 2),
-                      Text(st['role']!, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
-                      const SizedBox(height: 4),
-                      Text(st['services']!, style: const TextStyle(fontSize: 12, color: ZalonoTheme.primary, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )),
+              ),
+            )),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(
+              color: ZalonoTheme.primaryLight,
+              borderRadius: BorderRadius.circular(16)),
           child: const Text(
             'Not ready? Skip this. Customers will book the salon without choosing a stylist.',
-            style: TextStyle(color: ZalonoTheme.primaryDark, fontSize: 13, height: 1.4),
+            style: TextStyle(
+                color: ZalonoTheme.primaryDark, fontSize: 13, height: 1.4),
           ),
         ),
       ],
@@ -2094,7 +2433,8 @@ const SizedBox(height: 12),
         const SizedBox(height: 8),
         const Text(
           'Add more than one timing a day if you take a break. Use the toggle to switch a timing on or off.',
-          style: TextStyle(fontSize: 14.5, color: ZalonoTheme.textSecondary, height: 1.4),
+          style: TextStyle(
+              fontSize: 14.5, color: ZalonoTheme.textSecondary, height: 1.4),
         ),
         const SizedBox(height: 20),
         Container(
@@ -2125,7 +2465,11 @@ const SizedBox(height: 12),
         Center(
           child: TextButton(
             onPressed: _copyMondayTimings,
-            child: const Text("Copy Monday's timings to all days", style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700, fontSize: 14)),
+            child: const Text("Copy Monday's timings to all days",
+                style: TextStyle(
+                    color: ZalonoTheme.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14)),
           ),
         ),
       ],
@@ -2160,11 +2504,13 @@ const SizedBox(height: 12),
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 9),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFEFE8E1), width: 1.2),
+                          border: Border.all(
+                              color: const Color(0xFFEFE8E1), width: 1.2),
                         ),
                         child: Text(
                           slots[slotIdx]['slot'],
@@ -2181,7 +2527,8 @@ const SizedBox(height: 12),
                     const SizedBox(width: 10),
                     ZalonoSwitch(
                       value: slots[slotIdx]['on'] as bool,
-                      onChanged: (v) => setState(() => slots[slotIdx]['on'] = v),
+                      onChanged: (v) =>
+                          setState(() => slots[slotIdx]['on'] = v),
                     ),
                   ],
                 ),
@@ -2235,9 +2582,16 @@ const SizedBox(height: 12),
           child: Column(
             children: [
               _buildOwnerReviewRow(),
-              _buildReviewRow('Salon', '${_salonNameController.text} · $salonCategory', 4),
-              _buildReviewRow('Location', '${_addressController.text.split(',').first} · ${_pincodeController.text}', 5),
-              _buildReviewRow('Services', '${services.where((s) => s['checked'] == true).length} services', 6),
+              _buildReviewRow(
+                  'Salon', '${_salonNameController.text} · $salonCategory', 4),
+              _buildReviewRow(
+                  'Location',
+                  '${_addressController.text.split(',').first} · ${_pincodeController.text}',
+                  5),
+              _buildReviewRow(
+                  'Services',
+                  '${services.where((s) => s['checked'] == true).length} services',
+                  6),
               _buildReviewRow('Stylists', '${stylists.length} people', 7),
               _buildReviewRow('Timings', 'Open 7 days · Mon break 2–4 PM', 8),
             ],
@@ -2263,7 +2617,10 @@ const SizedBox(height: 12),
                   onTap: () => ActionDialogs.showTermsSheet(context),
                   child: const Text(
                     'I agree with all terms and policies of Zalono',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, decoration: TextDecoration.underline),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.underline),
                   ),
                 ),
               ),
@@ -2288,17 +2645,31 @@ const SizedBox(height: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 2),
-              Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: ZalonoTheme.textSecondary,
+                        fontWeight: FontWeight.w500)),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w800),
+                ),
+              ],
+            ),
           ),
           TextButton(
             onPressed: onEdit ?? () => _editReviewSection(stepTarget),
-            child: const Text('Edit', style: TextStyle(color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
+            child: const Text('Edit',
+                style: TextStyle(
+                    color: ZalonoTheme.primary, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -2390,76 +2761,108 @@ const SizedBox(height: 12),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const Spacer(),
-              const CircleAvatar(
-                radius: 40,
-                backgroundColor: ZalonoTheme.primary,
-                child: Icon(Icons.check, size: 40, color: Colors.white),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Application submitted',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: ZalonoTheme.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Thank you. We will notify you as soon as your salon is approved.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
-              ),
-              const SizedBox(height: 32),
-
-              // Status Card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: ZalonoTheme.border)),
-                child: Column(
-                  children: [
-                    _buildTimelineRow(Icons.check, 'Application submitted', 'We have your details.', true, true),
-                    _buildTimelineRow(Icons.radio_button_checked, 'Zalono verification', 'The team is checking Glow Studio.', true, true),
-                    _buildTimelineRow(Icons.radio_button_off, 'Approved', 'You get a notification, then you can log in.', false, false),
-                  ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                const CircleAvatar(
+                  radius: 40,
+                  backgroundColor: ZalonoTheme.primary,
+                  child: Icon(Icons.check, size: 40, color: Colors.white),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: ZalonoTheme.primaryLight, borderRadius: BorderRadius.circular(16)),
-                child: const Text(
-                  'You cannot log in until Zalono approves your salon.',
-                  style: TextStyle(color: ZalonoTheme.primaryDark, fontSize: 13, fontWeight: FontWeight.w600),
+                const SizedBox(height: 24),
+                const Text(
+                  'Application submitted',
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: ZalonoTheme.textPrimary),
                 ),
-              ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Thank you. We will notify you as soon as your salon is approved.',
+                  textAlign: TextAlign.center,
+                  style:
+                      TextStyle(fontSize: 15, color: ZalonoTheme.textSecondary),
+                ),
+                const SizedBox(height: 32),
 
-              const Spacer(),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<SalonAppState>().updateSalonRegistrationDetails(
-                    name: _salonNameController.text.trim(),
-                    category: salonCategory,
-                    serves: salonServes.join(', '),
-                    fullAddress: '${_addressController.text.trim()} ${_pincodeController.text.trim()}'.trim(),
-                    owner: _ownerNameController.text.trim(),
-                    phone: _phoneController.text.trim(),
-                    email: _emailController.text.trim(),
-                    gst: _gstController.text.trim(),
-                    photos: salonPhotoBytes.where((p) => p.isNotEmpty).toList(),
-                  );
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-                child: const Text('Done'),
-              ),
-            ],
+                // Status Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: ZalonoTheme.border)),
+                  child: Column(
+                    children: [
+                      _buildTimelineRow(Icons.check, 'Application submitted',
+                          'We have your details.', true, true),
+                      _buildTimelineRow(
+                          Icons.radio_button_checked,
+                          'Zalono verification',
+                          'The team is checking Glow Studio.',
+                          true,
+                          true),
+                      _buildTimelineRow(
+                          Icons.radio_button_off,
+                          'Approved',
+                          'You get a notification, then you can log in.',
+                          false,
+                          false),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                      color: ZalonoTheme.primaryLight,
+                      borderRadius: BorderRadius.circular(16)),
+                  child: const Text(
+                    'You cannot log in until Zalono approves your salon.',
+                    style: TextStyle(
+                        color: ZalonoTheme.primaryDark,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    context
+                        .read<SalonAppState>()
+                        .updateSalonRegistrationDetails(
+                          name: _salonNameController.text.trim(),
+                          category: salonCategory,
+                          serves: salonServes.join(', '),
+                          fullAddress:
+                              '${_addressController.text.trim()} ${_pincodeController.text.trim()}'
+                                  .trim(),
+                          owner: _ownerNameController.text.trim(),
+                          phone: _phoneController.text.trim(),
+                          email: _emailController.text.trim(),
+                          gst: _gstController.text.trim(),
+                          photos: salonPhotoBytes
+                              .where((p) => p.isNotEmpty)
+                              .toList(),
+                        );
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTimelineRow(IconData icon, String title, String subtitle, bool done, bool showLine) {
+  Widget _buildTimelineRow(
+      IconData icon, String title, String subtitle, bool done, bool showLine) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2467,8 +2870,10 @@ const SizedBox(height: 12),
           children: [
             CircleAvatar(
               radius: 12,
-              backgroundColor: done ? ZalonoTheme.primary : ZalonoTheme.surfaceMuted,
-              child: Icon(icon, size: 14, color: done ? Colors.white : ZalonoTheme.textMuted),
+              backgroundColor:
+                  done ? ZalonoTheme.primary : ZalonoTheme.surfaceMuted,
+              child: Icon(icon,
+                  size: 14, color: done ? Colors.white : ZalonoTheme.textMuted),
             ),
             if (showLine)
               Container(width: 2, height: 32, color: ZalonoTheme.primary),
@@ -2479,9 +2884,13 @@ const SizedBox(height: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+              Text(title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 15)),
               const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(fontSize: 13, color: ZalonoTheme.textSecondary)),
+              Text(subtitle,
+                  style: const TextStyle(
+                      fontSize: 13, color: ZalonoTheme.textSecondary)),
               const SizedBox(height: 16),
             ],
           ),

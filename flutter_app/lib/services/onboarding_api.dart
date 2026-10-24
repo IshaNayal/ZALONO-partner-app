@@ -9,7 +9,7 @@ class OnboardingApi {
   }) : baseUrl = baseUrl ??
             const String.fromEnvironment(
               'ZALONO_API_BASE_URL',
-              defaultValue: 'https://zalona-partner-app-1.onrender.com',
+              defaultValue: 'http://localhost:8080',
             );
 
   final String baseUrl;
@@ -38,7 +38,7 @@ class OnboardingApi {
     required List<Uint8List> salonPhotos,
   }) async {
     final user = await FirebaseService.ensureAuthenticated();
-    final token = await user.getIdToken();
+    final token = await user.getIdToken(true);
     if (token == null || token.isEmpty) {
       throw StateError('Firebase did not return an ID token.');
     }
