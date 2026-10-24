@@ -14,6 +14,7 @@ import 'screens/more_screens.dart';
 import 'package:provider/provider.dart';
 import 'services/app_state.dart';
 import 'services/firebase_service.dart';
+import 'utils/app_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +40,8 @@ class ZalonoPartnerApp extends StatelessWidget {
       title: 'Zalono Salon Partner',
       debugShowCheckedModeBanner: false,
       theme: ZalonoTheme.lightTheme,
-      initialRoute: '/',
+      initialRoute:
+          AppStorage.loadString('logged_in') == 'true' ? '/main' : '/',
       routes: {
         '/': (context) => const WelcomeScreen(),
         '/register': (context) => const RegistrationFlowScreen(),
@@ -93,8 +95,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           backgroundColor: Colors.white,
           selectedItemColor: ZalonoTheme.primary,
           unselectedItemColor: ZalonoTheme.textSecondary,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+          selectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          unselectedLabelStyle:
+              const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           items: const [

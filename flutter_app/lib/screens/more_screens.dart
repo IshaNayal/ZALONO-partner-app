@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_storage.dart';
 import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
 import '../widgets/zalono_switch.dart';
@@ -68,6 +69,7 @@ class _MoreScreenState extends State<MoreScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(ctx);
+                AppStorage.saveString('logged_in', '');
                 Navigator.pushReplacementNamed(context, '/');
               },
               child: const Text('Log out'),
@@ -354,7 +356,8 @@ class SalonProfileScreen extends StatelessWidget {
                                     if (index < state.salonPhotos.length) {
                                       context
                                           .read<SalonAppState>()
-                                          .updateSalonPhoto(index, picked.bytes);
+                                          .updateSalonPhoto(
+                                              index, picked.bytes);
                                     } else {
                                       context
                                           .read<SalonAppState>()
@@ -1139,7 +1142,6 @@ class _TimingsScreenState extends State<TimingsScreen> {
         child: Column(
           children: [
             // Top Spec Header: MORE | M4 · Timings
-            
 
             // Scrollable content with floating gradient bottom controls
             Expanded(

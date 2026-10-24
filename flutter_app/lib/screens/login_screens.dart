@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_storage.dart';
 import '../widgets/action_dialogs.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -91,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } else {
       // If tapped again or approved, enter the app
+      AppStorage.saveString('logged_in', 'true');
       Navigator.pushReplacementNamed(context, '/main');
     }
   }
