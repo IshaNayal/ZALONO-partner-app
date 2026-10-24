@@ -23,6 +23,11 @@ class HomeScreen extends StatelessWidget {
       context: context,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 30)),
+      initialDateRange: state.customDateRange ??
+          DateTimeRange(
+            start: DateTime.now().subtract(const Duration(days: 7)),
+            end: DateTime.now(),
+          ),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -36,7 +41,7 @@ class HomeScreen extends StatelessWidget {
       },
     );
     if (picked != null) {
-      state.setHomeFilter('Custom');
+      state.setCustomDateRange(picked.start, picked.end);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -228,10 +233,12 @@ class HomeScreen extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Online bookings only. Walk-ins are not counted.',
+              Text(
+                appState.selectedHomeFilter == 'Custom' && appState.customDateRange != null
+                    ? 'Showing ${appState.customDateRange!.start.day}/${appState.customDateRange!.start.month} - ${appState.customDateRange!.end.day}/${appState.customDateRange!.end.month} · Online bookings only'
+                    : 'Online bookings only. Walk-ins are not counted.',
                 style:
-                    TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary),
+                    const TextStyle(fontSize: 12, color: ZalonoTheme.textSecondary),
               ),
               const SizedBox(height: 16),
 

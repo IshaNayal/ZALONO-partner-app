@@ -896,7 +896,7 @@ class _CollectPaymentScreenState extends State<CollectPaymentScreen> {
   Widget build(BuildContext context) {
     final appState = context.read<SalonAppState>();
     final price = widget.booking.totalAmount.toInt();
-    final newRevenue = (appState.onlineRevenue + (widget.booking.type == BookingType.online ? widget.booking.totalAmount : 0)).toInt();
+    final newRevenue = (appState.todayOnlineRevenue + (widget.booking.type == BookingType.online ? widget.booking.totalAmount : 0)).toInt();
     final servicesClean = widget.booking.services
         .map((s) => s.name.replaceAll(RegExp(r'\s*\([^)]*\)'), ''))
         .join(' + ');

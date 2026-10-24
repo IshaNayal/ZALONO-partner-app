@@ -95,8 +95,10 @@ class SalonAppState extends ChangeNotifier {
         bookings = decoded.map((b) => BookingItem.fromJson(b as Map<String, dynamic>)).toList();
       }
       final savedBaseRevenue = AppStorage.loadString('base_revenue');
-      if (savedBaseRevenue != null && savedBaseRevenue.isNotEmpty) {
+      if (savedBaseRevenue != null && savedBaseRevenue.isNotEmpty && savedBaseRevenue != '4250') {
         baseRevenue = double.tryParse(savedBaseRevenue) ?? 0;
+      } else {
+        baseRevenue = 0;
       }
     } catch (e) {
       debugPrint('Error loading persisted state: $e');
@@ -449,7 +451,7 @@ class SalonAppState extends ChangeNotifier {
   ];
 
   // Base recorded revenue
-  double baseRevenue = 4250;
+  double baseRevenue = 0;
 
   // Notifications
   List<NotificationModel> notifications = [
@@ -543,11 +545,89 @@ class SalonAppState extends ChangeNotifier {
     ServiceItem(id: 'cs9', name: 'Pedicure', category: 'Nails', durationMinutes: 45, price: 599),
   ];
 
-  // Computed Properties
+  // Custom Date Filter
+  DateTimeRange? customDateRange;
+
+  void setCustomDateRange(DateTime start, DateTime end) {
+    customDateRange = DateTimeRange(start: start, end: end);
+    selectedHomeFilter = 'Custom';
+    notifyListeners();
+  }
+
+  bool isBookingInSelectedPeriod(BookingItem b) {
+    final dt = b.dateTime;
+    final now = DateTime.now();
+    switch (selectedHomeFilter) {
+      case 'This week':
+        final monday = DateTime(now.year, now.month, now.day)
+            .subtract(Duration(days: now.weekday - 1));
+        final startOfWeek = DateTime(monday.year, monday.month, monday.day, 0, 0, 0);
+        final endOfWeek = DateTime(
+          monday.year,
+          monday.month,
+          monday.day + 6,
+          23,
+          59,
+          59,
+          999,
+        );
+        return !dt.isBefore(startOfWeek) && !dt.isAfter(endOfWeek);
+
+      case 'This month':
+        return dt.year == now.year && dt.month == now.month;
+
+      case 'Custom':
+        if (customDateRange != null) {
+          final start = DateTime(
+            customDateRange!.start.year,
+            customDateRange!.start.month,
+            customDateRange!.start.day,
+            0,
+            0,
+            0,
+          );
+          final end = DateTime(
+            customDateRange!.end.year,
+            customDateRange!.end.month,
+            customDateRange!.end.day,
+            23,
+            59,
+            59,
+            999,
+          );
+          return !dt.isBefore(start) && !dt.isAfter(end);
+        }
+        return dt.year == now.year && dt.month == now.month && dt.day == now.day;
+
+      case 'Today':
+      default:
+        return dt.year == now.year && dt.month == now.month && dt.day == now.day;
+    }
+  }
+
+  // Today-specific revenue (used on checkout and today summaries)
+  double get todayOnlineRevenue {
+    double total = 0;
+    final now = DateTime.now();
+    for (var b in bookings) {
+      if (b.type == BookingType.online &&
+          b.status == BookingStatus.done &&
+          b.dateTime.year == now.year &&
+          b.dateTime.month == now.month &&
+          b.dateTime.day == now.day) {
+        total += b.totalAmount;
+      }
+    }
+    return total;
+  }
+
+  // Computed Properties (Filter-aware, starts at 0 and adds on top)
   double get onlineRevenue {
     double total = 0;
     for (var b in bookings) {
-      if (b.type == BookingType.online && b.status == BookingStatus.done) {
+      if (b.type == BookingType.online &&
+          b.status == BookingStatus.done &&
+          isBookingInSelectedPeriod(b)) {
         total += b.totalAmount;
       }
     }
@@ -555,37 +635,27 @@ class SalonAppState extends ChangeNotifier {
   }
 
   int get totalBookingsCount {
-    int count = bookings.where((b) => b.type == BookingType.online).length;
-    switch (selectedHomeFilter) {
-      case 'This week':
-        return count * 4;
-      case 'This month':
-        return count * 15;
-      case 'Custom':
-        return count * 2;
-      case 'Today':
-      default:
-        return count;
-    }
+    return bookings
+        .where((b) => b.type == BookingType.online && isBookingInSelectedPeriod(b))
+        .length;
   }
 
   int get doneBookingsCount {
-    int doneToday = bookings.where((b) => b.status == BookingStatus.done).length;
-    switch (selectedHomeFilter) {
-      case 'This week':
-        return doneToday * 3;
-      case 'This month':
-        return doneToday * 12;
-      case 'Custom':
-        return doneToday * 2;
-      case 'Today':
-      default:
-        return doneToday;
-    }
+    return bookings
+        .where((b) =>
+            b.type == BookingType.online &&
+            b.status == BookingStatus.done &&
+            isBookingInSelectedPeriod(b))
+        .length;
   }
 
   int get toComeBookingsCount {
-    return bookings.where((b) => b.status == BookingStatus.confirmed || b.status == BookingStatus.inChair).length;
+    return bookings
+        .where((b) =>
+            b.type == BookingType.online &&
+            (b.status == BookingStatus.confirmed || b.status == BookingStatus.inChair) &&
+            isBookingInSelectedPeriod(b))
+        .length;
   }
 
   int get unreadNotificationsCount {

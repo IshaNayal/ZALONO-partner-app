@@ -205,7 +205,7 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
     _otpControllers = List.generate(6, (_) => TextEditingController());
     _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
-    _onboardingCodeController = TextEditingController();
+    _onboardingCodeController = TextEditingController(text: 'ZL-BBS-4821');
     _onboardingCodeController.addListener(_verifyOnboardingCode);
     _verifyOnboardingCode();
 
@@ -290,7 +290,8 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
   }
 
   void _verifyOnboardingCode() {
-    final isVerified = _onboardingCodeController.text.trim() == 'ZL-BBS-4821';
+    final isVerified =
+        _onboardingCodeController.text.trim().toUpperCase() == 'ZL-BBS-4821';
     if (codeVerified != isVerified && mounted) {
       setState(() {
         codeVerified = isVerified;
@@ -1172,7 +1173,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: ZalonoTheme.primary, width: 1.5),
+            border: Border.all(
+              color: codeVerified ? ZalonoTheme.primary : ZalonoTheme.border,
+              width: 1.5,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1185,13 +1189,17 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.5),
                   decoration: const InputDecoration(
-                      border: InputBorder.none, isDense: true),
+                      hintText: 'ZL-BBS-4821',
+                      border: InputBorder.none,
+                      isDense: true),
                 ),
               ),
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 12,
-                backgroundColor: ZalonoTheme.primary,
-                child: Icon(Icons.check, size: 16, color: Colors.white),
+                backgroundColor: codeVerified
+                    ? ZalonoTheme.primary
+                    : const Color(0xFFD0CBC6),
+                child: const Icon(Icons.check, size: 16, color: Colors.white),
               ),
             ],
           ),
@@ -1283,7 +1291,9 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w600),
                   decoration: const InputDecoration(
-                      border: InputBorder.none, isDense: true),
+                      hintText: 'ZL-BBS-4821',
+                      border: InputBorder.none,
+                      isDense: true),
                 ),
               ),
               GestureDetector(
@@ -2600,7 +2610,10 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: ZalonoTheme.primary, width: 1.5),
+            border: Border.all(
+              color: codeVerified ? ZalonoTheme.primary : ZalonoTheme.border,
+              width: 1.5,
+            ),
           ),
           child: Row(
             children: [
@@ -2762,10 +2775,12 @@ class _RegistrationFlowScreenState extends State<RegistrationFlowScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 24),
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 40,
-                  backgroundColor: ZalonoTheme.primary,
-                  child: Icon(Icons.check, size: 40, color: Colors.white),
+                  backgroundColor: codeVerified
+                    ? ZalonoTheme.primary
+                    : const Color(0xFFD0CBC6),
+                  child: const Icon(Icons.check, size: 40, color: Colors.white),
                 ),
                 const SizedBox(height: 24),
                 const Text(
