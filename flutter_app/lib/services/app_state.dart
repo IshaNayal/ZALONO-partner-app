@@ -717,6 +717,7 @@ class SalonAppState extends ChangeNotifier {
       final b = bookings[index];
       b.status = BookingStatus.done;
       b.paymentMethod = paymentMethod;
+      baseRevenue += amount;
 
       // Free the stylist
       final stylistIndex = stylists.indexWhere((s) => s.name.toLowerCase().contains(b.stylistName.toLowerCase()));
