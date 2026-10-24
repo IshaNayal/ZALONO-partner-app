@@ -12,13 +12,15 @@ import 'screens/notifications_screen.dart';
 import 'screens/more_screens.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'services/app_state.dart';
 import 'services/firebase_service.dart';
-import 'utils/app_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseService.initialize();
+  final preferences = await SharedPreferences.getInstance();
+  final isLoggedIn = preferences.getBool('logged_in') ?? false;
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -26,13 +28,15 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => SalonAppState(),
-      child: const ZalonoPartnerApp(),
+      child: ZalonoPartnerApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class ZalonoPartnerApp extends StatelessWidget {
-  const ZalonoPartnerApp({super.key});
+  final bool isLoggedIn;
+
+  const ZalonoPartnerApp({super.key, this.isLoggedIn = false});
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +44,7 @@ class ZalonoPartnerApp extends StatelessWidget {
       title: 'Zalono Salon Partner',
       debugShowCheckedModeBanner: false,
       theme: ZalonoTheme.lightTheme,
-      initialRoute:
-          AppStorage.loadString('logged_in') == 'true' ? '/main' : '/',
+      initialRoute: isLoggedIn ? '/main' : '/',
       routes: {
         '/': (context) => const WelcomeScreen(),
         '/register': (context) => const RegistrationFlowScreen(),

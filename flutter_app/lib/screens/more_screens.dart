@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
-import '../utils/app_storage.dart';
 import '../utils/file_upload_helper.dart';
 import '../widgets/action_dialogs.dart';
 import '../widgets/zalono_switch.dart';
@@ -67,9 +67,10 @@ class _MoreScreenState extends State<MoreScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(ctx);
-                AppStorage.saveString('logged_in', '');
+                final preferences = await SharedPreferences.getInstance();
+                await preferences.remove('logged_in');
                 Navigator.pushReplacementNamed(context, '/');
               },
               child: const Text('Log out'),

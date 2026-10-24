@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
-import '../utils/app_storage.dart';
 import '../widgets/action_dialogs.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final code = _otpControllers.map((c) => c.text).join();
     if (code.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,7 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } else {
       // If tapped again or approved, enter the app
-      AppStorage.saveString('logged_in', 'true');
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('logged_in', true);
       Navigator.pushReplacementNamed(context, '/main');
     }
   }
