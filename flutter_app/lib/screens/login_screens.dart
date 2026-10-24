@@ -94,7 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
       // If tapped again or approved, enter the app
       final preferences = await SharedPreferences.getInstance();
       await preferences.setBool('logged_in', true);
-      Navigator.pushReplacementNamed(context, '/main');
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
     }
   }
 
