@@ -9,7 +9,7 @@ class OnboardingApi {
   }) : baseUrl = baseUrl ??
             const String.fromEnvironment(
               'ZALONO_API_BASE_URL',
-              defaultValue: 'http://localhost:8080',
+              defaultValue: 'https://zalona-partner-backend.onrender.com',
             );
 
   final String baseUrl;
