@@ -545,26 +545,13 @@ class SalonAppState extends ChangeNotifier {
 
   // Computed Properties
   double get onlineRevenue {
-    double extraRevenue = 0;
+    double total = 0;
     for (var b in bookings) {
       if (b.type == BookingType.online && b.status == BookingStatus.done) {
-        // Count today's done bookings
-        if (b.dateTime.day == DateTime.now().day && b.dateTime.month == DateTime.now().month) {
-          extraRevenue += b.totalAmount;
-        }
+        total += b.totalAmount;
       }
     }
-    switch (selectedHomeFilter) {
-      case 'This week':
-        return baseRevenue * 4.2 + extraRevenue;
-      case 'This month':
-        return baseRevenue * 18.5 + extraRevenue;
-      case 'Custom':
-        return baseRevenue * 2.1 + extraRevenue;
-      case 'Today':
-      default:
-        return baseRevenue + extraRevenue;
-    }
+    return total;
   }
 
   int get totalBookingsCount {
