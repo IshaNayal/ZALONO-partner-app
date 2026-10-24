@@ -5,6 +5,30 @@ import '../models/models.dart';
 import '../utils/app_storage.dart';
 
 class SalonAppState extends ChangeNotifier {
+@override
+  void notifyListeners() {
+    _persistBookings();
+    _persistBaseRevenue();
+    super.notifyListeners();
+  }
+
+  void _persistBookings() {
+    try {
+      final encoded = jsonEncode(bookings.map((b) => b.toJson()).toList());
+      AppStorage.saveString('bookings', encoded);
+    } catch (e) {
+      debugPrint('Error persisting bookings: $e');
+    }
+  }
+
+  void _persistBaseRevenue() {
+    try {
+      AppStorage.saveString('base_revenue', baseRevenue.toString());
+    } catch (e) {
+      debugPrint('Error persisting base revenue: $e');
+    }
+  }
+
   // Salon Information
   String salonName = '';
   String salonCategory = '';
@@ -27,9 +51,6 @@ class SalonAppState extends ChangeNotifier {
   int salonServicesCount = 0;
 
   SalonAppState() {
-    bookings.clear();
-    notifications.clear();
-    baseRevenue = 0;
     _loadPersistedState();
   }
 
@@ -68,6 +89,15 @@ class SalonAppState extends ChangeNotifier {
       if (savedOwner != null && savedOwner.isNotEmpty) ownerName = savedOwner;
       final savedPhone = AppStorage.loadString('owner_phone');
       if (savedPhone != null && savedPhone.isNotEmpty) ownerPhone = savedPhone;
+      final savedBookings = AppStorage.loadString('bookings');
+      if (savedBookings != null && savedBookings.isNotEmpty) {
+        final List decoded = jsonDecode(savedBookings);
+        bookings = decoded.map((b) => BookingItem.fromJson(b as Map<String, dynamic>)).toList();
+      }
+      final savedBaseRevenue = AppStorage.loadString('base_revenue');
+      if (savedBaseRevenue != null && savedBaseRevenue.isNotEmpty) {
+        baseRevenue = double.tryParse(savedBaseRevenue) ?? 0;
+      }
     } catch (e) {
       debugPrint('Error loading persisted state: $e');
     }

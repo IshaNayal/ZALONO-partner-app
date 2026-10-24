@@ -1,5 +1,3 @@
-
-
 enum SalonCategory { basic, medium, premium, ultraPremium }
 enum BookingStatus { inChair, confirmed, done, noShow, cancelled }
 enum BookingType { online, walkIn }
@@ -21,6 +19,24 @@ class ServiceItem {
     required this.price,
     this.isSelected = false,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'category': category,
+    'durationMinutes': durationMinutes,
+    'price': price,
+    'isSelected': isSelected,
+  };
+
+  factory ServiceItem.fromJson(Map<String, dynamic> json) => ServiceItem(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    category: json['category'] as String,
+    durationMinutes: json['durationMinutes'] as int,
+    price: (json['price'] as num).toDouble(),
+    isSelected: json['isSelected'] as bool? ?? false,
+  );
 }
 
 class StylistItem {
@@ -41,6 +57,24 @@ class StylistItem {
   });
 
   String get initials => name.isNotEmpty ? name[0] : '';
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'role': role,
+    'services': services,
+    'isAvailable': isAvailable,
+    'statusDetail': statusDetail,
+  };
+
+  factory StylistItem.fromJson(Map<String, dynamic> json) => StylistItem(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    role: json['role'] as String,
+    services: (json['services'] as List).cast<String>(),
+    isAvailable: json['isAvailable'] as bool? ?? true,
+    statusDetail: json['statusDetail'] as String?,
+  );
 }
 
 class BookingItem {
@@ -55,7 +89,7 @@ class BookingItem {
   final BookingType type;
   BookingStatus status;
   PaymentMethod? paymentMethod;
-  final String? customerStatus; // "Leaving now · about 8 min away"
+  final String? customerStatus; // "Leaving now Â· about 8 min away"
 
   BookingItem({
     required this.id,
@@ -71,6 +105,38 @@ class BookingItem {
     this.paymentMethod,
     this.customerStatus,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'customerName': customerName,
+    'customerPhone': customerPhone,
+    'timeString': timeString,
+    'dateTime': dateTime.toIso8601String(),
+    'services': services.map((s) => s.toJson()).toList(),
+    'stylistName': stylistName,
+    'totalAmount': totalAmount,
+    'type': type.name,
+    'status': status.name,
+    'paymentMethod': paymentMethod?.name,
+    'customerStatus': customerStatus,
+  };
+
+  factory BookingItem.fromJson(Map<String, dynamic> json) => BookingItem(
+    id: json['id'] as String,
+    customerName: json['customerName'] as String,
+    customerPhone: json['customerPhone'] as String,
+    timeString: json['timeString'] as String,
+    dateTime: DateTime.parse(json['dateTime'] as String),
+    services: (json['services'] as List).map((s) => ServiceItem.fromJson(s as Map<String, dynamic>)).toList(),
+    stylistName: json['stylistName'] as String,
+    totalAmount: (json['totalAmount'] as num).toDouble(),
+    type: BookingType.values.firstWhere((e) => e.name == json['type']),
+    status: BookingStatus.values.firstWhere((e) => e.name == json['status']),
+    paymentMethod: json['paymentMethod'] != null
+        ? PaymentMethod.values.firstWhere((e) => e.name == json['paymentMethod'])
+        : null,
+    customerStatus: json['customerStatus'] as String?,
+  );
 }
 
 class DayTiming {
