@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 import '../widgets/action_dialogs.dart';
@@ -252,31 +253,83 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: isFocused ? 1.8 : 1,
                         ),
                       ),
-                      child: TextField(
-                        controller: _otpControllers[index],
-                        focusNode: _otpFocusNodes[index],
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        maxLength: 1,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w800),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          counterText: '',
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            if (val.isNotEmpty && index < 5) {
-                              _otpFocusNodes[index + 1].requestFocus();
+                      child: Focus(
+                        onKeyEvent: (node, event) {
+                          if (event is KeyDownEvent) {
+                            if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                              if (_otpControllers[index].text.isNotEmpty) {
+                                _otpControllers[index].clear();
+                                setState(() {});
+                              } else if (index > 0) {
+                                _otpControllers[index - 1].clear();
+                                _otpFocusNodes[index - 1].requestFocus();
+                                setState(() {});
+                              }
+                              return KeyEventResult.handled;
+                            } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                              if (index > 0) {
+                                _otpFocusNodes[index - 1].requestFocus();
+                              }
+                              return KeyEventResult.handled;
+                            } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                              if (index < 5) {
+                                _otpFocusNodes[index + 1].requestFocus();
+                              }
+                              return KeyEventResult.handled;
                             }
-                            final code =
-                                _otpControllers.map((c) => c.text).join();
+                          }
+                          return KeyEventResult.ignored;
+                        },
+                        child: TextField(
+                          controller: _otpControllers[index],
+                          focusNode: _otpFocusNodes[index],
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          maxLength: 1,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w800),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            counterText: '',
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          onChanged: (val) {
+                            if (val.isEmpty) return;
+                            // Handle paste of multiple digits
+                            if (val.length > 1) {
+                              final digits = val.replaceAll(RegExp(r'[^0-9]'), '');
+                              for (int i = 0; i < digits.length && (index + i) < 6; i++) {
+                                _otpControllers[index + i].text = digits[i];
+                              }
+                              final lastIndex = (index + digits.length - 1).clamp(0, 5);
+                              if (lastIndex < 5) {
+                                _otpFocusNodes[lastIndex + 1].requestFocus();
+                              } else {
+                                _otpFocusNodes[5].unfocus();
+                              }
+                              setState(() {});
+                              return;
+                            }
+                            // Single digit - replace and move forward
+                            final digit = val.replaceAll(RegExp(r'[^0-9]'), '');
+                            if (digit.isEmpty) {
+                              _otpControllers[index].clear();
+                              setState(() {});
+                              return;
+                            }
+                            _otpControllers[index].text = digit[0];
+                            if (index < 5) {
+                              _otpFocusNodes[index + 1].requestFocus();
+                            } else {
+                              _otpFocusNodes[5].unfocus();
+                            }
+                            final code = _otpControllers.map((c) => c.text).join();
                             if (code.length == 6) {
                               _otpFocusNodes[5].unfocus();
                             }
-                          });
-                        },
+                            setState(() {});
+                          },
+                        ),
                       ),
                     );
                   }),
