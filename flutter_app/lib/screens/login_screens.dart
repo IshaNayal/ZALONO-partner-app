@@ -285,7 +285,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusNode: _otpFocusNodes[index],
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          maxLength: 1,
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w800),
                           decoration: const InputDecoration(
