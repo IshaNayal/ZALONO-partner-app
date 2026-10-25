@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late List<FocusNode> _otpFocusNodes;
 
   bool isBlocked = false;
+  bool _isPasting = false;
   bool showNotificationSim = false;
   int resendCountdown = 24;
   Timer? _timer;
@@ -285,17 +286,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           focusNode: _otpFocusNodes[index],
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w800),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             counterText: '',
                             contentPadding: EdgeInsets.zero,
                           ),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                           onChanged: (val) {
                             if (val.isEmpty) return;
+                            if (_isPasting) return;
                             // Handle paste of multiple digits
                             if (val.length > 1) {
+                              _isPasting = true;
                               final digits = val.replaceAll(RegExp(r'[^0-9]'), '');
                               for (int i = 0; i < digits.length && (index + i) < 6; i++) {
                                 _otpControllers[index + i].text = digits[i];
@@ -307,6 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _otpFocusNodes[5].unfocus();
                               }
                               setState(() {});
+                              _isPasting = false;
                               return;
                             }
                             // Single digit - replace and move forward
