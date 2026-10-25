@@ -28,7 +28,32 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _phoneController = TextEditingController();
     _otpControllers = List.generate(6, (_) => TextEditingController());
-    _otpFocusNodes = List.generate(6, (_) => FocusNode());
+    _otpFocusNodes = List.generate(6, (i) => FocusNode(onKeyEvent: (node, event) {
+      if (event is KeyDownEvent) {
+        if (event.logicalKey == LogicalKeyboardKey.backspace) {
+          if (_otpControllers[i].text.isNotEmpty) {
+            _otpControllers[i].clear();
+            setState(() {});
+          } else if (i > 0) {
+            _otpControllers[i - 1].clear();
+            _otpFocusNodes[i - 1].requestFocus();
+            setState(() {});
+          }
+          return KeyEventResult.handled;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+          if (i > 0) {
+            _otpFocusNodes[i - 1].requestFocus();
+          }
+          return KeyEventResult.handled;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+          if (i < 5) {
+            _otpFocusNodes[i + 1].requestFocus();
+          }
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    }));
 
     _startCountdown();
   }
@@ -254,39 +279,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: isFocused ? 1.8 : 1,
                         ),
                       ),
-                      child: Focus(
-                        onKeyEvent: (node, event) {
-                          if (event is KeyDownEvent) {
-                            if (event.logicalKey == LogicalKeyboardKey.backspace) {
-                              if (_otpControllers[index].text.isNotEmpty) {
-                                _otpControllers[index].clear();
-                                setState(() {});
-                              } else if (index > 0) {
-                                _otpControllers[index - 1].clear();
-                                _otpFocusNodes[index - 1].requestFocus();
-                                setState(() {});
-                              }
-                              return KeyEventResult.handled;
-                            } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-                              if (index > 0) {
-                                _otpFocusNodes[index - 1].requestFocus();
-                              }
-                              return KeyEventResult.handled;
-                            } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-                              if (index < 5) {
-                                _otpFocusNodes[index + 1].requestFocus();
-                              }
-                              return KeyEventResult.handled;
-                            }
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: TextField(
+child: TextField(
                           controller: _otpControllers[index],
                           focusNode: _otpFocusNodes[index],
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-style: const TextStyle(
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w800),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -336,7 +334,6 @@ style: const TextStyle(
                             setState(() {});
                           },
                         ),
-                      ),
                     );
                   }),
                 ),
