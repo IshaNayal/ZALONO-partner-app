@@ -34,9 +34,9 @@ void main() {
     // Verify Step 1 is rendered
     expect(find.text('STEP 1 OF 9'), findsOneWidget);
 
-    // Enter OTP 123456
+    // Enter phone number and OTP 123456
     final textFields = find.byType(TextField);
-    // index 0 is phone number, 1-6 are OTP
+    await tester.enterText(textFields.first, '8527678461');
     for (int i = 0; i < 6; i++) {
       await tester.enterText(textFields.at(i + 1), '${i + 1}');
     }
@@ -68,6 +68,14 @@ void main() {
 
     // Verify 'Verify your email' screen is displayed
     expect(find.text('Verify your email'), findsOneWidget);
+
+    // Enter email OTP 123456
+    final emailOtpFields = find.byType(TextField);
+    for (int i = 0; i < 6; i++) {
+      await tester.enterText(emailOtpFields.at(i), '${i + 1}');
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('Email verified'), findsOneWidget);
 
     // Verify Continue button on 'Verify your email' is enabled and works
     final continueEmailVerifyBtn = find.widgetWithText(ElevatedButton, 'Continue');

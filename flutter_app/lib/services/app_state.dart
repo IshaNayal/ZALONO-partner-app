@@ -88,7 +88,14 @@ class SalonAppState extends ChangeNotifier {
       final savedOwner = AppStorage.loadString('owner_name');
       if (savedOwner != null && savedOwner.isNotEmpty) ownerName = savedOwner;
       final savedPhone = AppStorage.loadString('owner_phone');
-      if (savedPhone != null && savedPhone.isNotEmpty) ownerPhone = savedPhone;
+      if (savedPhone != null &&
+          savedPhone.isNotEmpty &&
+          !savedPhone.contains('8527678461') &&
+          !savedPhone.contains('98765')) {
+        ownerPhone = savedPhone;
+      } else {
+        ownerPhone = '';
+      }
       final savedBookings = AppStorage.loadString('bookings');
       if (savedBookings != null && savedBookings.isNotEmpty) {
         final List decoded = jsonDecode(savedBookings);

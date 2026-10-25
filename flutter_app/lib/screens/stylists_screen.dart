@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../services/app_state.dart';
@@ -817,6 +818,7 @@ class _TurnOffStylistSheet extends StatefulWidget {
 class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
   String selectedOffDuration = 'Until 5:00 PM';
   late String selectedReassignTarget;
+  DateTime? customDateTime;
 
   @override
   void initState() {
@@ -825,18 +827,153 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
         widget.otherStylists.isNotEmpty ? widget.otherStylists.first : '';
   }
 
+  Future<void> _pickCustomDateTime(BuildContext context) async {
+    final now = DateTime.now();
+    final initialDate = customDateTime ?? now;
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate.isBefore(now) ? now : initialDate,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: now.add(const Duration(days: 365)),
+      helpText: 'Select Date to Turn On',
+      confirmText: 'NEXT',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: ZalonoTheme.primary,
+              onPrimary: Colors.white,
+              onSurface: ZalonoTheme.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate == null) {
+      if (customDateTime == null) {
+        setState(() {
+          customDateTime = now.add(const Duration(hours: 2));
+        });
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    final initialTime = customDateTime != null
+        ? TimeOfDay(hour: customDateTime!.hour, minute: customDateTime!.minute)
+        : TimeOfDay.fromDateTime(now.add(const Duration(hours: 1)));
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      helpText: 'Select Time to Turn On',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: ZalonoTheme.primary,
+              onPrimary: Colors.white,
+              onSurface: ZalonoTheme.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    final finalTime = pickedTime ?? initialTime;
+    setState(() {
+      customDateTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        finalTime.hour,
+        finalTime.minute,
+      );
+    });
+  }
+
+  String _formatCustomDateTime(DateTime dt) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDay = DateTime(dt.year, dt.month, dt.day);
+    final diffDays = targetDay.difference(today).inDays;
+
+    final timeStr = DateFormat('h:mm a').format(dt);
+    if (diffDays == 0) {
+      return 'Today · $timeStr';
+    } else if (diffDays == 1) {
+      return 'Tomorrow · $timeStr';
+    } else {
+      return '${DateFormat('EEE, d MMM').format(dt)} · $timeStr';
+    }
+  }
+
+  String _getEffectiveDuration() {
+    if (selectedOffDuration == 'Custom') {
+      final dt = customDateTime ?? DateTime.now().add(const Duration(hours: 2));
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final targetDay = DateTime(dt.year, dt.month, dt.day);
+      final diffDays = targetDay.difference(today).inDays;
+      final timeStr = DateFormat('h:mm a').format(dt);
+
+      if (diffDays == 0) {
+        return 'Until $timeStr';
+      } else if (diffDays == 1) {
+        return 'Until Tomorrow, $timeStr';
+      } else {
+        return 'Until ${DateFormat('d MMM').format(dt)}, $timeStr';
+      }
+    }
+    return selectedOffDuration;
+  }
+
+  String _getReminderText() {
+    if (selectedOffDuration == 'Until 5:00 PM') {
+      return 'We will remind you at 5:00 PM to turn ${widget.stylistName} on.';
+    } else if (selectedOffDuration == 'Today') {
+      return 'We will remind you at 9:00 PM to turn ${widget.stylistName} on.';
+    } else if (selectedOffDuration == 'Tomorrow') {
+      return 'We will remind you tomorrow at 9:00 AM to turn ${widget.stylistName} on.';
+    } else if (selectedOffDuration == 'Custom') {
+      final dt = customDateTime ?? DateTime.now().add(const Duration(hours: 2));
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final targetDay = DateTime(dt.year, dt.month, dt.day);
+      final diffDays = targetDay.difference(today).inDays;
+      final timeStr = DateFormat('h:mm a').format(dt);
+
+      if (diffDays == 0) {
+        return 'We will remind you today at $timeStr to turn ${widget.stylistName} on.';
+      } else if (diffDays == 1) {
+        return 'We will remind you tomorrow at $timeStr to turn ${widget.stylistName} on.';
+      } else {
+        final dateStr = DateFormat('d MMM').format(dt);
+        return 'We will remind you on $dateStr at $timeStr to turn ${widget.stylistName} on.';
+      }
+    }
+    return 'We will remind you to turn ${widget.stylistName} on.';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           Text(
             'Turn off ${widget.stylistName}?',
             style: const TextStyle(
@@ -863,7 +1000,12 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
               final active = dur == selectedOffDuration;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(() => selectedOffDuration = dur),
+                  onTap: () async {
+                    setState(() => selectedOffDuration = dur);
+                    if (dur == 'Custom') {
+                      await _pickCustomDateTime(context);
+                    }
+                  },
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -889,16 +1031,93 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
               );
             }).toList(),
           ),
+          if (selectedOffDuration == 'Custom') ...[
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () => _pickCustomDateTime(context),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: ZalonoTheme.primaryLight,
+                  borderRadius: BorderRadius.circular(14),
+                  border:
+                      Border.all(color: ZalonoTheme.primary.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_month_outlined,
+                        size: 18, color: ZalonoTheme.primary),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'CUSTOM DATE & TIME',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: ZalonoTheme.primaryDark,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatCustomDateTime(customDateTime ??
+                                DateTime.now().add(const Duration(hours: 2))),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: ZalonoTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: ZalonoTheme.primary.withValues(alpha: 0.5)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.edit_calendar_outlined,
+                              size: 13, color: ZalonoTheme.primary),
+                          SizedBox(width: 4),
+                          Text(
+                            'Change',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: ZalonoTheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
               const Icon(Icons.notifications_none,
                   size: 14, color: ZalonoTheme.primary),
               const SizedBox(width: 6),
-              Text(
-                'We will remind you at 5:00 PM to turn ${widget.stylistName} on.',
-                style: const TextStyle(
-                    fontSize: 12, color: ZalonoTheme.textSecondary),
+              Expanded(
+                child: Text(
+                  _getReminderText(),
+                  style: const TextStyle(
+                      fontSize: 12, color: ZalonoTheme.textSecondary),
+                ),
               ),
             ],
           ),
@@ -920,7 +1139,6 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  
                   const SizedBox(height: 10),
                   Row(
                     children: widget.otherStylists.map((target) {
@@ -968,7 +1186,7 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
           ElevatedButton(
             onPressed: () {
               widget.onConfirmWithDetails(
-                  selectedOffDuration, selectedReassignTarget);
+                  _getEffectiveDuration(), selectedReassignTarget);
             },
             child: Text('Turn off ${widget.stylistName}'),
           ),
@@ -978,6 +1196,8 @@ class _TurnOffStylistSheetState extends State<_TurnOffStylistSheet> {
             child: const Text('Cancel'),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

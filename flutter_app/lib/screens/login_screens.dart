@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 import '../widgets/action_dialogs.dart';
+import '../widgets/zalono_otp_input.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   late List<FocusNode> _otpFocusNodes;
 
   bool isBlocked = false;
-  bool _isPasting = false;
   bool showNotificationSim = false;
   int resendCountdown = 24;
   Timer? _timer;
@@ -28,32 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _phoneController = TextEditingController();
     _otpControllers = List.generate(6, (_) => TextEditingController());
-    _otpFocusNodes = List.generate(6, (i) => FocusNode(onKeyEvent: (node, event) {
-      if (event is KeyDownEvent) {
-        if (event.logicalKey == LogicalKeyboardKey.backspace) {
-          if (_otpControllers[i].text.isNotEmpty) {
-            _otpControllers[i].clear();
-            setState(() {});
-          } else if (i > 0) {
-            _otpControllers[i - 1].clear();
-            _otpFocusNodes[i - 1].requestFocus();
-            setState(() {});
-          }
-          return KeyEventResult.handled;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-          if (i > 0) {
-            _otpFocusNodes[i - 1].requestFocus();
-          }
-          return KeyEventResult.handled;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-          if (i < 5) {
-            _otpFocusNodes[i + 1].requestFocus();
-          }
-          return KeyEventResult.handled;
-        }
-      }
-      return KeyEventResult.ignored;
-    }));
+    _otpFocusNodes = List.generate(6, (_) => FocusNode());
 
     _startCountdown();
   }
@@ -101,6 +75,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+    if (phoneDigits.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid 10-digit mobile number.'),
+          backgroundColor: ZalonoTheme.primary,
+        ),
+      );
+      return;
+    }
     final code = _otpControllers.map((c) => c.text).join();
     if (code.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,8 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  bool get _isOtpComplete =>
-      _otpControllers.every((controller) => controller.text.isNotEmpty);
+  bool get _isOtpComplete {
+    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+    final code = _otpControllers.map((c) => c.text).join();
+    return phoneDigits.length >= 10 && code.length == 6;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -258,84 +245,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: ZalonoTheme.textSecondary),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(6, (index) {
-                    final isFocused = _otpFocusNodes[index].hasFocus;
-                    final hasVal = _otpControllers[index].text.isNotEmpty;
-                    return Container(
-                      width: 46,
-                      height: 52,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isFocused
-                              ? ZalonoTheme.primary
-                              : (hasVal
-                                  ? ZalonoTheme.textPrimary
-                                  : ZalonoTheme.border),
-                          width: isFocused ? 1.8 : 1,
-                        ),
-                      ),
-child: TextField(
-                          controller: _otpControllers[index],
-                          focusNode: _otpFocusNodes[index],
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w800),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: '',
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (val) {
-                            if (val.isEmpty) return;
-                            if (_isPasting) return;
-                            // Handle paste of multiple digits
-                            if (val.length > 1) {
-                              _isPasting = true;
-                              final digits = val.replaceAll(RegExp(r'[^0-9]'), '');
-                              for (int i = 0; i < digits.length && (index + i) < 6; i++) {
-                                _otpControllers[index + i].text = digits[i];
-                              }
-                              final lastIndex = (index + digits.length - 1).clamp(0, 5);
-                              if (lastIndex < 5) {
-                                _otpFocusNodes[lastIndex + 1].requestFocus();
-                              } else {
-                                _otpFocusNodes[5].unfocus();
-                              }
-                              setState(() {});
-                              _isPasting = false;
-                              return;
-                            }
-                            // Single digit - replace and move forward
-                            final digit = val.replaceAll(RegExp(r'[^0-9]'), '');
-                            if (digit.isEmpty) {
-                              _otpControllers[index].clear();
-                              setState(() {});
-                              return;
-                            }
-                            _otpControllers[index].text = digit[0];
-                            if (index < 5) {
-                              _otpFocusNodes[index + 1].requestFocus();
-                            } else {
-                              _otpFocusNodes[5].unfocus();
-                            }
-                            final code = _otpControllers.map((c) => c.text).join();
-                            if (code.length == 6) {
-                              _otpFocusNodes[5].unfocus();
-                            }
-                            setState(() {});
-                          },
-                        ),
-                    );
-                  }),
+                ZalonoOtpInput(
+                  controllers: _otpControllers,
+                  focusNodes: _otpFocusNodes,
+                  onChanged: () => setState(() {}),
+                  onCompleted: (code) {
+                    setState(() {});
+                  },
                 ),
                 const SizedBox(height: 12),
 

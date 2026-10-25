@@ -607,15 +607,30 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
                     color: ZalonoTheme.textSecondary)),
             const SizedBox(height: 8),
 
-            Row(
-              children: appState.stylists.where((s) => s.isAvailable).map((st) {
+            if (appState.stylists.where((s) => s.isAvailable).isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text('No stylists are available right now.',
+                    style: TextStyle(
+                        fontSize: 13, color: ZalonoTheme.textSecondary)),
+              )
+            else
+              Row(
+                children: appState.stylists.where((s) => s.isAvailable).map((st) {
                 final isSelected = (_selectedStylist ?? '')
                     .toLowerCase()
                     .contains(st.name.split(' ').first.toLowerCase());
                 return Expanded(
                   child: GestureDetector(
-                    onTap: () => setState(
-                        () => _selectedStylist = st.name.split(' ').first),
+                    onTap: () {
+                      setState(() {
+                        if (isSelected) {
+                          _selectedStylist = null;
+                        } else {
+                          _selectedStylist = st.name.split(' ').first;
+                        }
+                      });
+                    },
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       padding: const EdgeInsets.all(14),
@@ -663,7 +678,9 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: ZalonoTheme.primaryLight,
+                color: _selectedStylist != null
+                    ? ZalonoTheme.primaryLight
+                    : ZalonoTheme.surfaceMuted,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -672,7 +689,9 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                        color: ZalonoTheme.primary,
+                        color: _selectedStylist != null
+                            ? ZalonoTheme.primary
+                            : ZalonoTheme.textMuted,
                         borderRadius: BorderRadius.circular(6)),
                     child:
                         const Icon(Icons.lock, color: Colors.white, size: 14),
@@ -682,15 +701,20 @@ class _AddWalkInSheetState extends State<_AddWalkInSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('$_selectedStylist blocked · $totalMinutes min',
+                        Text(
+                            _selectedStylist != null
+                                ? '$_selectedStylist blocked · $totalMinutes min'
+                                : 'No stylist selected',
                             style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: ZalonoTheme.textPrimary)),
                         const SizedBox(height: 2),
-                        const Text(
-                          'Online booking is closed for this time. Stylist opens again automatically when you mark this walk-in done.',
-                          style: TextStyle(
+                        Text(
+                          _selectedStylist != null
+                              ? 'Online booking is closed for this time. Stylist opens again automatically when you mark this walk-in done.'
+                              : 'Select an available stylist above to block their slot for this walk-in.',
+                          style: const TextStyle(
                               fontSize: 12,
                               color: ZalonoTheme.textSecondary,
                               height: 1.3),
